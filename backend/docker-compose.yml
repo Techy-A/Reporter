@@ -1,0 +1,84 @@
+# PeoplePilot self-hosted stack. Three separate app processes + worker + Postgres.
+#
+#   admin     -> Admin portal API      (bind to localhost / VPN only, never the public internet)
+#   portal    -> Employee portal API   (public, behind your HTTPS reverse proxy)
+#   webhooks  -> WhatsApp/Telegram     (public, behind your HTTPS reverse proxy)
+#   worker    -> reminders + retention purge
+#
+# 1. cp .env.example .env and fill in every secret (see the generator commands in .env.example)
+# 2. docker compose up -d
+# 3. Put an HTTPS reverse proxy (Caddy / nginx) in front of portal and webhooks.
+
+x-app: &app
+  build: .
+  env_file: .env
+  restart: unless-stopped
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+  read_only: true
+  tmpfs: [/tmp]
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: peoplepilot
+      POSTGRES_USER: pp_owner
+      POSTGRES_PASSWORD: ${PP_DB_OWNER_PASSWORD:?set PP_DB_OWNER_PASSWORD in .env}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pp_owner -d peoplepilot"]
+      interval: 5s
+      retries: 10
+    networks: [internal]
+
+  migrate:   # runs once as the DB owner: tables + roles + row-level security
+    build: .
+    env_file: .env
+    command: python -m peoplepilot.migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks: [internal]
+
+  admin:
+    <<: *app
+    command: uvicorn peoplepilot.apps.admin.main:app --host 0.0.0.0 --port 8001 --proxy-headers --forwarded-allow-ips=127.0.0.1
+    environment:
+      PP_DATABASE_URL: ${PP_ADMIN_DATABASE_URL:?set PP_ADMIN_DATABASE_URL}
+    ports: ["127.0.0.1:8001:8001"]   # localhost only; reach it over VPN/SSH tunnel
+    networks: [internal]
+
+  portal:
+    <<: *app
+    command: uvicorn peoplepilot.apps.portal.main:app --host 0.0.0.0 --port 8002 --proxy-headers --forwarded-allow-ips=127.0.0.1
+    environment:
+      PP_DATABASE_URL: ${PP_PORTAL_DATABASE_URL:?set PP_PORTAL_DATABASE_URL}
+    ports: ["127.0.0.1:8002:8002"]   # expose through your HTTPS reverse proxy
+    networks: [internal]
+
+  webhooks:
+    <<: *app
+    command: uvicorn peoplepilot.apps.webhooks.main:app --host 0.0.0.0 --port 8003 --proxy-headers --forwarded-allow-ips=127.0.0.1
+    environment:
+      PP_DATABASE_URL: ${PP_BOT_DATABASE_URL:?set PP_BOT_DATABASE_URL}
+    ports: ["127.0.0.1:8003:8003"]   # expose through your HTTPS reverse proxy
+    networks: [internal]
+
+  worker:
+    <<: *app
+    command: python -m peoplepilot.worker
+    environment:
+      PP_DATABASE_URL: ${PP_WORKER_DATABASE_URL:?set PP_WORKER_DATABASE_URL}
+    networks: [internal]
+
+networks:
+  internal:
+
+volumes:
+  pgdata:
