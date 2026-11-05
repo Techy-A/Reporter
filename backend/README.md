@@ -87,7 +87,8 @@ docker compose up -d
 `migrate` runs first as the DB owner and creates the per-process roles (`pp_admin`, `pp_portal`, `pp_bot`, `pp_worker`) and RLS policies. Put Caddy or nginx with HTTPS in front of `portal` (8002) and `webhooks` (8003). Keep `admin` (8001) on localhost / VPN.
 
 ## Status / not yet done
-- ✅ Tested here: everything in `tests/` on SQLite (40 passing).
+- ✅ Tested here: everything in `tests/` on SQLite (41 passing), and the full flow clicked through in the browser with the front end (`../frontend`) and the simulator.
+- 💸 Everything runs for free on your own laptop: SQLite, Telegram or the built-in simulator, and no AI needed (or a free local Ollama model).
 - ⚠️ **Not run yet:** the Postgres path (`migrate.py`, row-level security, per-role grants) and `docker compose` (no Docker on the dev machine). Test on a Postgres box before a pilot.
 - ⚠️ WhatsApp and Telegram senders are written to the public API docs but haven't been exercised against the live services.
-- ⏭️ Next: Google/Microsoft calendar free/busy + invites (today availability comes only from bookings in PeoplePilot, and interviewers add the `.ics`), the front-end (design prompts in `../design/`), and a CI workflow.
+- ⏭️ Next: Google/Microsoft calendar free/busy + invites (today availability comes only from bookings in PeoplePilot, and interviewers add the `.ics`), and a free GitHub Actions CI workflow.

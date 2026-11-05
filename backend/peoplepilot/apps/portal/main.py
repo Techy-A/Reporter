@@ -123,6 +123,10 @@ def request_code(body: CodeRequestIn, request: Request, session: Session = Depen
                               expires_at=utcnow() + CODE_TTL))
         session.flush()
         send_code(email, code)
+        s = get_settings()
+        if s.env == "dev" and s.simulator_on and not s.smtp_host:
+            # Dev convenience only (no email server): show the code on screen.
+            return {**GENERIC_SENT, "dev_code": code}
     return GENERIC_SENT
 
 

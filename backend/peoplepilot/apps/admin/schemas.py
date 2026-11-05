@@ -219,3 +219,4 @@ class HealthOut(BaseModel):
     llm_configured: bool
     messaging_paused: bool
     candidates_without_consent: int
+    simulator: bool = False

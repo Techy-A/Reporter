@@ -1,0 +1,11 @@
+{
+  "name": "peoplepilot-frontend",
+  "private": true,
+  "workspaces": ["shared", "admin", "portal"],
+  "scripts": {
+    "dev:admin": "npm run dev -w admin",
+    "dev:portal": "npm run dev -w portal",
+    "build": "npm run build -w admin && npm run build -w portal",
+    "typecheck": "npm run typecheck -w admin && npm run typecheck -w portal"
+  }
+}

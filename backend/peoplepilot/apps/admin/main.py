@@ -50,6 +50,11 @@ def _issue_cookie(response: Response, user: AdminUser, mfa: bool) -> None:
 
 
 # ================================================================== setup & auth
+@app.get("/api/setup/status")
+def setup_status(session: Session = Depends(get_session)):
+    return {"setup_done": (session.scalar(select(func.count()).select_from(Tenant)) or 0) > 0}
+
+
 @app.post("/api/setup", status_code=201)
 def setup(body: S.SetupIn, response: Response, session: Session = Depends(get_session)):
     """First-run only. Requires PP_SETUP_TOKEN from the server's environment."""
@@ -469,6 +474,56 @@ def health(session: Session = Depends(get_session), ctx: AdminCtx = Depends(curr
         channels={"whatsapp": "whatsapp" in kinds, "telegram": "telegram" in kinds},
         llm_configured=bool(s.llm_base_url and s.llm_model),
         messaging_paused=session.get(Tenant, ctx.tenant_id).messaging_paused,
+        simulator=s.simulator_on,
         candidates_without_consent=session.scalar(select(func.count()).select_from(Candidate).where(
             Candidate.tenant_id == ctx.tenant_id, Candidate.consent.is_(False))) or 0,
     )
+
+
+# ================================================================== dev-only candidate simulator
+# Lets you play the candidate from the admin UI without WhatsApp/Telegram. Registered only when
+# PP_SIMULATOR=true and PP_ENV is not prod, so these routes don't exist in production.
+if get_settings().simulator_on:
+    from pydantic import BaseModel, ConfigDict, Field
+
+    from ...channels.base import sim_channel
+
+    class SimIn(BaseModel):
+        model_config = ConfigDict(extra="forbid")
+        text: str | None = Field(default=None, max_length=1000)
+        token: str | None = Field(default=None, max_length=64)
+
+    class SimButton(BaseModel):
+        label: str
+        token: str
+
+    class SimOut(BaseModel):
+        messages: list[S.MessageOut]
+        buttons: list[SimButton]
+
+    def _sim_state(session: Session, ctx: AdminCtx, c: Candidate) -> SimOut:
+        msgs = session.scalars(scoped(Message, ctx.tenant_id).where(Message.candidate_id == c.id)
+                               .order_by(Message.id)).all()
+        live = not c.bot_paused and c.fsm_state not in ("needs_recruiter", "cancelled", "done")
+        buttons = sim_channel.latest_buttons.get(engine.channel_address(c), []) if live else []
+        return SimOut(
+            messages=[S.MessageOut(direction=m.direction, sender=m.sender, text=m.text_redacted, intent=m.intent,
+                                   at=m.created_at) for m in msgs],
+            buttons=[SimButton(label=b.label, token=b.token) for b in buttons],
+        )
+
+    @app.get("/api/dev/sim/{candidate_id}", response_model=SimOut)
+    def sim_get(candidate_id: int, session: Session = Depends(get_session), ctx: AdminCtx = Depends(current_admin)):
+        return _sim_state(session, ctx, _cand(session, ctx, candidate_id))
+
+    @app.post("/api/dev/sim/{candidate_id}", response_model=SimOut)
+    def sim_post(candidate_id: int, body: SimIn, session: Session = Depends(get_session),
+                 ctx: AdminCtx = Depends(current_admin)):
+        c = _cand(session, ctx, candidate_id)
+        if not (body.text or body.token):
+            raise HTTPException(422, "Send text or tap a button")
+        if body.token:
+            sim_channel.latest_buttons.pop(engine.channel_address(c), None)
+        engine.handle_inbound(session, c, text=body.text, button_token=body.token)
+        session.flush()
+        return _sim_state(session, ctx, c)

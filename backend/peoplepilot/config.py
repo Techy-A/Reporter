@@ -6,6 +6,7 @@ signing keys, so a token minted for one can never be accepted by the other.
 from __future__ import annotations
 
 import ipaddress
+import os
 from functools import lru_cache
 
 from pydantic import Field, field_validator, model_validator
@@ -13,7 +14,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="PP_", extra="ignore")
+    model_config = SettingsConfigDict(env_file=os.environ.get("PP_ENV_FILE", ".env"), env_prefix="PP_", extra="ignore")
 
     env: str = "dev"  # dev | test | prod
     database_url: str = "sqlite:///./peoplepilot.db"
@@ -51,6 +52,14 @@ class Settings(BaseSettings):
     smtp_user: str | None = None
     smtp_password: str | None = None
     smtp_from: str = "PeoplePilot <no-reply@localhost>"
+
+    # Dev only: route all candidate messages to an in-app simulator instead of WhatsApp/Telegram.
+    # Ignored when PP_ENV=prod.
+    simulator: bool = False
+
+    @property
+    def simulator_on(self) -> bool:
+        return self.simulator and self.env != "prod"
 
     @field_validator("admin_allowed_cidrs")
     @classmethod

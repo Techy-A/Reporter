@@ -47,6 +47,22 @@ class FakeChannel:
         self.sent.append(msg)
 
 
+class SimChannel:
+    """Dev-only simulator: keeps the latest buttons per address so the admin UI can play
+    the candidate. Only used when PP_SIMULATOR=true and PP_ENV is not prod."""
+
+    kind = "sim"
+
+    def __init__(self) -> None:
+        self.latest_buttons: dict[str, list[Button]] = {}
+
+    def send(self, msg: Outbound) -> None:
+        if msg.buttons:
+            self.latest_buttons[msg.to] = list(msg.buttons)
+
+
+sim_channel = SimChannel()
+
 # Tests/dev can force a channel implementation for every tenant.
 _override: Channel | None = None
 
@@ -59,6 +75,10 @@ def set_channel_override(channel: Channel | None) -> None:
 def get_channel(session: Session, tenant_id: int, kind: str) -> Channel:
     if _override is not None:
         return _override
+    from ..config import get_settings
+
+    if get_settings().simulator_on:
+        return sim_channel
     cfg = session.scalars(
         select(ChannelConfig).where(ChannelConfig.tenant_id == tenant_id, ChannelConfig.kind == kind)
     ).first()

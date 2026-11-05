@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-api",
+      "runtimeExecutable": "D:/AGENTIC_HR/backend/.venv/Scripts/uvicorn.exe",
+      "runtimeArgs": ["peoplepilot.apps.admin.main:app", "--app-dir", "D:/AGENTIC_HR/backend", "--env-file", "D:/AGENTIC_HR/backend/.env", "--port", "8001"],
+      "port": 8001
+    },
+    {
+      "name": "portal-api",
+      "runtimeExecutable": "D:/AGENTIC_HR/backend/.venv/Scripts/uvicorn.exe",
+      "runtimeArgs": ["peoplepilot.apps.portal.main:app", "--app-dir", "D:/AGENTIC_HR/backend", "--env-file", "D:/AGENTIC_HR/backend/.env", "--port", "8002"],
+      "port": 8002
+    },
+    {
+      "name": "admin-ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "D:/AGENTIC_HR/frontend/admin"],
+      "port": 5171
+    },
+    {
+      "name": "portal-ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "D:/AGENTIC_HR/frontend/portal"],
+      "port": 5172
+    }
+  ]
+}

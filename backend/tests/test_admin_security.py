@@ -163,3 +163,9 @@ def test_logout_revokes_session(admin_app):
     replay = TestClient(admin_app, base_url="https://admin.test")
     replay.cookies.set(tokens.COOKIE_NAMES["admin"], stolen)
     assert replay.get("/api/candidates").status_code == 401
+
+
+def test_simulator_routes_absent_unless_enabled(admin_app):
+    c, _ = setup_tenant(admin_app)
+    assert c.get("/api/dev/sim/1").status_code == 404
+    assert c.get("/api/health").json()["simulator"] is False

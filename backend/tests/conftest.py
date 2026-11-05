@@ -11,6 +11,7 @@ import pytest
 from cryptography.fernet import Fernet
 
 os.environ.update({
+    "PP_ENV_FILE": "does-not-exist.env",  # never read a developer's local .env in tests
     "PP_ENV": "test",
     "PP_ADMIN_JWT_KEY": "a" * 48,
     "PP_PORTAL_JWT_KEY": "p" * 48,
