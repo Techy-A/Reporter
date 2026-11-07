@@ -169,3 +169,15 @@ def test_simulator_routes_absent_unless_enabled(admin_app):
     c, _ = setup_tenant(admin_app)
     assert c.get("/api/dev/sim/1").status_code == 404
     assert c.get("/api/health").json()["simulator"] is False
+
+
+def test_reset_admin_recovers_access_and_clears_mfa(admin_app):
+    from peoplepilot.reset_admin import reset
+
+    old, _ = setup_tenant(admin_app)
+    reset("owner@acme.co.in", "a brand new long password", new_email="new.owner@acme.co.in")
+    assert old.get("/api/auth/me").status_code == 401  # old sessions signed out
+    c = new_admin_client(admin_app)
+    r = c.post("/api/auth/login", headers=H, json={"email": "new.owner@acme.co.in", "password": "a brand new long password"})
+    assert r.status_code == 200 and r.json()["mfa_setup_required"] is True
+    assert c.get("/api/kpis").status_code == 403  # must enrol two-factor before using the portal
