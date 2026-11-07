@@ -38,10 +38,10 @@ export default function SlotRail({ rows, onOpen }: { rows: CandidateRow[]; onOpe
               <span className="rail-dow">
                 {i === 0 ? "Today" : new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", weekday: "short" }).format(d)}
               </span>
-              <span className="rail-date mono">
+              <span className="rail-date num">
                 {new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit" }).format(d)}
               </span>
-              <span className="rail-count mono" aria-label={`${items.length} interviews`}>{items.length || ""}</span>
+              <span className="rail-count num" aria-label={`${items.length} interviews`}>{items.length || ""}</span>
             </div>
             <div className="rail-track">
               {HOURS.map((h) => (
@@ -63,7 +63,7 @@ export default function SlotRail({ rows, onOpen }: { rows: CandidateRow[]; onOpe
                     onClick={() => onOpen(r.id)}
                     title={`${r.name} · ${fmtTime(t)} · ${STATUS[r.status]?.label ?? r.status}`}
                   >
-                    <span className="mono">{fmtTime(t)}</span> {r.name.split(" ")[0]}
+                    <span className="num">{fmtTime(t)}</span> {r.name.split(" ")[0]}
                   </button>
                 );
               })}

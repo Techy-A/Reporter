@@ -22,10 +22,10 @@ export default function Activity() {
             <tbody>
               {(log.data ?? []).map((a, i) => (
                 <tr key={i}>
-                  <td className="mono small">{fmtDayTime(parseUtc(a.at))}</td>
+                  <td className="num small">{fmtDayTime(parseUtc(a.at))}</td>
                   <td className="small">{ACTOR[a.actor_type] ?? a.actor_type}{a.actor_id ? <span className="muted"> #{a.actor_id}</span> : ""}</td>
                   <td className="small mono">{a.action}</td>
-                  <td className="small muted">{a.record_type ? `${a.record_type} #${a.record_id}` : "—"}</td>
+                  <td className="small muted">{a.record_type ? `${a.record_type} #${a.record_id}` : ""}</td>
                   <td>{a.result === "ok" ? <span className="pill pill-ok">ok</span> : <span className="pill pill-bad">{a.result}</span>}</td>
                 </tr>
               ))}

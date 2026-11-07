@@ -100,7 +100,7 @@ export default function CandidateDrawer({ id, rounds, employees, simulator, onCl
             <h2>{c?.name ?? "Loading…"}</h2>
             {c && (
               <div className="small muted">
-                {round ? `${round.role_title} · ${round.round_name}` : ""} · <span className="mono">{c.phone_masked}</span>
+                {round ? `${round.role_title} · ${round.round_name}` : ""} · <span className="num">{c.phone_masked}</span>
               </div>
             )}
           </div>
@@ -114,7 +114,7 @@ export default function CandidateDrawer({ id, rounds, employees, simulator, onCl
               {c.bot_paused && <span className="pill pill-warn">You're handling this chat</span>}
               {c.booked_start && (
                 <span className="small">
-                  <span className="mono">{fmtDayTime(parseUtc(c.booked_start))}</span>
+                  <span className="num">{fmtDayTime(parseUtc(c.booked_start))}</span>
                   {interviewer ? ` with ${interviewer.name}` : ""}
                 </span>
               )}
@@ -161,7 +161,7 @@ export default function CandidateDrawer({ id, rounds, employees, simulator, onCl
                   <div className="bubble-text">{m.text}</div>
                   <div className="bubble-meta">
                     {m.sender === "recruiter" ? "You" : m.sender === "bot" ? "Assistant" : "Candidate"}
-                    {" · "}<span className="mono">{fmtTime(parseUtc(m.at))}</span>
+                    {" · "}<span className="num">{fmtTime(parseUtc(m.at))}</span>
                     {m.intent && m.direction === "in" && <span className="intent">understood as: {m.intent.replace("_", " ")}</span>}
                   </div>
                 </div>

@@ -62,9 +62,9 @@ export default function Rounds() {
                   {r.round_name} · {r.duration_min} min · {r.mode === "video" ? "Video" : "In person"}
                 </div>
                 <dl className="facts">
-                  <div><dt>Dates</dt><dd className="mono">{fmtDay(parseUtc(r.window_start))} – {fmtDay(parseUtc(r.window_end))}</dd></div>
+                  <div><dt>Dates</dt><dd className="num">{fmtDay(parseUtc(r.window_start))} to {fmtDay(parseUtc(r.window_end))}</dd></div>
                   <div><dt>Interviewers</dt><dd>{r.interviewer_ids.map(name).join(", ")}</dd></div>
-                  <div><dt>Candidates</dt><dd className="mono">{count}</dd></div>
+                  <div><dt>Candidates</dt><dd className="num">{count}</dd></div>
                 </dl>
               </div>
               <CsvUpload roundId={r.id} onDone={() => void cands.reload()} />

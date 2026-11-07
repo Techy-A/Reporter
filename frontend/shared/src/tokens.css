@@ -29,8 +29,16 @@
   --font-ui: "Figtree Variable", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  --r-sm: 6px;
+  /* Radius scale: use only these. Nested elements: inner = outer - padding, floor --r-xs. */
+  --r-xs: 6px;
+  --r-sm: 8px;
   --r: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+  /* Motion: feedback only (a reply arrives, a request is sent). Off under reduced motion. */
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --ease: cubic-bezier(.2, .7, .2, 1);
   --shadow: 0 1px 2px rgb(22 27 46 / 6%), 0 4px 16px rgb(22 27 46 / 5%);
   --focus: 0 0 0 3px rgb(232 163 61 / 55%);
   color-scheme: light;
@@ -80,11 +88,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3 { margin: 0; font-weight: 400; }
-h1 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; color: var(--ink); }
-h2 { font-family: var(--font-display); font-size: 20px; color: var(--ink); }
+/* Display type is ~2.5x body so each page has one clear place for the eye to land. */
+h1 { font-family: var(--font-display); font-size: 36px; line-height: 1.12; letter-spacing: -.01em; color: var(--ink); text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 20px; line-height: 1.25; color: var(--ink); text-wrap: balance; }
 h3 { font-size: 13px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--slate); }
 a { color: var(--ink-2); }
-.mono { font-family: var(--font-mono); font-feature-settings: "zero" 1; }
+.mono { font-family: var(--font-mono); font-feature-settings: "zero" 1; } /* codes, IDs, versions only */
+.num { font-variant-numeric: tabular-nums; } /* times, dates, counts: aligned digits in the UI face */
+.icon { flex: none; vertical-align: -0.15em; }
 .muted { color: var(--slate); }
 .small { font-size: 13px; }
 
@@ -116,11 +127,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .input:focus { border-color: var(--saffron); }
 .hint { font-size: 12.5px; color: var(--slate); }
 
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); } /* flat: only floating things get a shadow */
 
 .pill {
   display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px;
-  border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  border-radius: var(--r-pill); font-size: 12.5px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums;
   background: var(--ink-soft); color: var(--ink-2);
 }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -137,7 +148,17 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .trust {
   font-size: 12px; color: var(--slate); display: inline-flex; gap: 6px; align-items: center;
 }
-.trust::before { content: "🔒"; font-size: 11px; }
+.trust::before {
+  content: ""; width: 12px; height: 12px; flex: none; background: currentColor;
+  -webkit-mask: var(--lock-icon) center / contain no-repeat; mask: var(--lock-icon) center / contain no-repeat;
+}
+:root {
+  --lock-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='11' width='16' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E");
+}
+
+/* Useful feedback: something new arrived or was confirmed. */
+@keyframes pp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rise { animation: pp-rise var(--dur) var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

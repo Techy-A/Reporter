@@ -119,13 +119,13 @@ export default function Board() {
                     <tr key={r.id} className={r.needs_attention ? "row-attention" : ""} onClick={() => setOpen(r.id)}>
                       <td>
                         <button className="link-btn strong" onClick={(e) => { e.stopPropagation(); setOpen(r.id); }}>{r.name}</button>
-                        <div className="small muted mono">{r.phone_masked}</div>
+                        <div className="small muted num">{r.phone_masked}</div>
                       </td>
-                      <td className="small">{rd ? <>{rd.role_title}<div className="muted">{rd.round_name}</div></> : "—"}</td>
+                      <td className="small">{rd ? <>{rd.role_title}<div className="muted">{rd.round_name}</div></> : ""}</td>
                       <td><StatusPill status={r.status} /></td>
-                      <td className="mono small">{r.booked_start ? fmtDayTime(parseUtc(r.booked_start)) : "—"}</td>
-                      <td className="small">{r.interviewer_id ? empById.get(r.interviewer_id)?.name ?? "—" : "—"}</td>
-                      <td className="small muted">{r.last_message_at ? relative(parseUtc(r.last_message_at)) : "—"}</td>
+                      <td className="num small">{r.booked_start ? fmtDayTime(parseUtc(r.booked_start)) : <span className="muted">Not booked</span>}</td>
+                      <td className="small">{r.interviewer_id ? empById.get(r.interviewer_id)?.name ?? "" : <span className="muted">Not assigned</span>}</td>
+                      <td className="small muted">{r.last_message_at ? relative(parseUtc(r.last_message_at)) : "No messages yet"}</td>
                     </tr>
                   );
                 })}

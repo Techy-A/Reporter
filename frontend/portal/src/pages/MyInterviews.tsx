@@ -227,7 +227,7 @@ function Card({ i, now, upcoming, badge, children }: {
       <div className="p-where-box">
         <div className="p-where-row">
           <span className="p-where-kind">{i.mode === "video" ? "Video call" : "In person"}</span>
-          <span className="mono small">{fmtTime(start)} – {fmtTime(end)}</span>
+          <span className="num small">{fmtTime(start)} to {fmtTime(end)}</span>
         </div>
         {i.location && !isLink && <div className="small p-where-loc">{i.location}</div>}
       </div>

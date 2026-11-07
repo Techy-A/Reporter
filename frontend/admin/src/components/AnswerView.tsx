@@ -18,8 +18,8 @@ export default function AnswerView({ r }: { r: AskResult }) {
       <div className="answer-head">
         <span className={`pill pill-${k.tone}`}>{k.label}</span>
         {r.meta.used_llm && (
-          <span className="small muted mono">
-            {r.meta.agent_steps} step{r.meta.agent_steps === 1 ? "" : "s"} · {r.meta.tokens_in}→{r.meta.tokens_out} tokens
+          <span className="small muted num">
+            {r.meta.agent_steps} step{r.meta.agent_steps === 1 ? "" : "s"} · {r.meta.tokens_in} tokens in, {r.meta.tokens_out} out
             {r.meta.tools_used.length > 0 && ` · tools: ${[...new Set(r.meta.tools_used)].join(", ")}`}
           </span>
         )}

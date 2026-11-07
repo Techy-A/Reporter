@@ -56,7 +56,7 @@ export default function SignIn({ onSignedIn }: { onSignedIn: () => Promise<void>
         <div className="p-brand">
           <span className="p-mark" aria-hidden>R</span>
           <span className="p-brand-name">Reporter</span>
-          <span className="p-realm">Employee</span>
+          <span className="p-realm">Employee portal</span>
         </div>
         {step === "email" ? (
           <form onSubmit={sendCode} className="p-form">
@@ -103,7 +103,7 @@ export default function SignIn({ onSignedIn }: { onSignedIn: () => Promise<void>
             </button>
             <div className="p-resend small muted">
               Didn't get it?{" "}
-              {wait > 0 ? <span className="mono">Resend in {wait}s</span>
+              {wait > 0 ? <span className="num">Resend in {wait}s</span>
                 : <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={() => sendCode()}>Resend code</button>}
             </div>
           </form>

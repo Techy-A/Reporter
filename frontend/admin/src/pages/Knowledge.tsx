@@ -70,8 +70,8 @@ function Policies() {
                   <div className="small muted mono">v{p.version} · {p.source_name}</div>
                 </td>
                 <td className="small">{audience(p)}</td>
-                <td className="small mono">{p.effective_from}</td>
-                <td className="small mono">{p.clause_count}{p.embedded > 0 && <span className="muted"> · {p.embedded} embedded</span>}</td>
+                <td className="small num">{p.effective_from}</td>
+                <td className="small num">{p.clause_count}{p.embedded > 0 && <span className="muted"> · {p.embedded} embedded</span>}</td>
                 <td><span className={`pill ${STATUS[p.status][1]}`}>{STATUS[p.status][0]}</span></td>
                 <td className="right nowrap">
                   {p.status !== "active" && <button className="btn btn-sm" onClick={() => act(p, "activate")}>Make live</button>}
@@ -158,7 +158,7 @@ function PolicyClauses({ id }: { id: number }) {
       <ol className="clauses">
         {p.data.clauses?.map((c) => (
           <li key={c.id}>
-            <div className="strong">{c.ref && <span className="mono">§{c.ref} </span>}{c.heading || <span className="muted">(no heading)</span>}</div>
+            <div className="strong">{c.ref && <span className="clause-ref">§{c.ref}</span>}{c.heading || <span className="muted">(no heading)</span>}</div>
             <p className="small">{c.text}</p>
           </li>
         ))}
@@ -246,9 +246,9 @@ function Leave() {
       </p>
       {sum.data && (
         <dl className="facts">
-          <div><dt>People</dt><dd className="mono">{sum.data.employees}</dd></div>
-          <div><dt>Rows</dt><dd className="mono">{sum.data.rows}</dd></div>
-          <div><dt>Latest “as of”</dt><dd className="mono">{sum.data.latest_as_of ?? "–"}</dd></div>
+          <div><dt>People</dt><dd className="num">{sum.data.employees}</dd></div>
+          <div><dt>Rows</dt><dd className="num">{sum.data.rows}</dd></div>
+          <div><dt>Latest “as of”</dt><dd className="num">{sum.data.latest_as_of ?? "Nothing uploaded"}</dd></div>
         </dl>
       )}
       <CsvButton path="/api/leave-balances/csv" label="Upload leave CSV" template={LEAVE_TEMPLATE}

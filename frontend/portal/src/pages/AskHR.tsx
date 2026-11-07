@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { api, errorText } from "@pp/shared";
+import { api, errorText, Icon } from "@pp/shared";
 import type { Me } from "../main";
 
 type Citation = { policy_title: string; version: string; ref: string; heading: string; excerpt: string };
@@ -61,23 +61,24 @@ export default function AskHR({ me }: { me: Me }) {
 
   return (
     <div className="p-page ask">
-      <div className="p-title">
-        <div>
-          <h1>Ask HR</h1>
-          <p className="small muted">Answers come from your organisation's policies and HR's records, with the source shown.</p>
-        </div>
-      </div>
+      <header className={`ask-head${turns.length ? " is-compact" : ""}`}>
+        <h1>{turns.length ? "Ask HR" : `What do you need from HR, ${me.name.split(" ")[0]}?`}</h1>
+        <p className="muted">
+          Answers come from your company's policies and HR's records, and show the section they're from.
+          English or Hinglish both work.
+        </p>
+      </header>
 
       <div className="ask-thread" aria-live="polite">
-        {turns.length === 0 && (
-          <div className="ask-hello">
-            <p>Hi {me.name.split(" ")[0]}, what do you need? Tap a topic or type your question, in English or Hinglish.</p>
+        {turns.map((t) => t.who === "me"
+          ? <div key={t.id} className="ask-me rise">{t.text}</div>
+          : <BotTurn key={t.id} q={t.q} a={t.a} />)}
+        {busy && (
+          <div className="ask-bot ask-typing rise" role="status">
+            <span className="dots" aria-hidden><i /><i /><i /></span>
+            <span className="small muted">Checking your policies</span>
           </div>
         )}
-        {turns.map((t) => t.who === "me"
-          ? <div key={t.id} className="ask-me">{t.text}</div>
-          : <BotTurn key={t.id} q={t.q} a={t.a} />)}
-        {busy && <div className="ask-bot ask-typing" aria-label="Looking it up">Looking it up…</div>}
         <div ref={end} />
       </div>
 
@@ -128,15 +129,17 @@ function BotTurn({ q, a }: { q: string; a: Answer }) {
   if (a.kind === "sensitive") {
     return (
       <div className="ask-bot ask-sensitive">
-        <div className="ask-lock" aria-hidden>🔒</div>
+        <div className="ask-sensitive-head"><Icon name="shield" size={18} /><b>A person will help with this</b></div>
         <p>{a.text}</p>
         <ul className="ask-contacts">
           {a.contacts.map((c) => (
             <li key={c.label}><span className="small muted">{c.label}</span>
-              {/^\d+$/.test(c.value) ? <a className="mono" href={`tel:${c.value}`}>{c.value}</a> : <b>{c.value}</b>}</li>
+              {/^\d+$/.test(c.value)
+                ? <a className="ask-tel num" href={`tel:${c.value}`}><Icon name="phone" size={14} /> {c.value}</a>
+                : <b>{c.value}</b>}</li>
           ))}
         </ul>
-        {sent ? <div className="notice notice-ok small">{sent}</div> : (
+        {sent ? <div className="notice notice-ok small rise">{sent}</div> : (
           <button className="btn" onClick={() => ticket("sensitive", "")}>Ask HR to contact me privately</button>
         )}
         {err && <div className="notice notice-bad small">{err}</div>}
@@ -145,19 +148,23 @@ function BotTurn({ q, a }: { q: string; a: Answer }) {
   }
 
   return (
-    <div className={`ask-bot${a.kind === "no_answer" ? " is-unknown" : ""}`}>
+    <div className={`ask-bot rise${a.kind === "no_answer" ? " is-unknown" : ""}`}>
       {SOURCE[a.kind] && !(a.kind === "leave" && a.actions.length > 0) && <div className="ask-source small">{SOURCE[a.kind]}{a.meta.used_llm && " · AI"}</div>}
-      <p className="ask-text">{a.text}</p>
+      {/* A verbatim quote already says where it's from; the intro line would repeat the label above. */}
+      {a.kind !== "policy_quote" && <p className="ask-text">{a.text}</p>}
       {a.citations.length > 0 && (
         <div className="ask-cites">
           {a.citations.map((c, i) => (
-            <details key={i} className="ask-cite" open={a.kind === "policy_quote"}>
+            <details key={i} className="slip" open={a.kind === "policy_quote" && i === 0}>
               <summary>
-                <span className="ask-cite-title">{c.policy_title}{c.ref && <span className="mono"> §{c.ref}</span>}</span>
-                {c.heading && <span className="small muted"> {c.heading}</span>}
+                {c.ref && <span className="slip-ref">§{c.ref}</span>}
+                <span className="slip-title">
+                  <b>{c.heading || c.policy_title}</b>
+                  {c.heading && <span className="small muted">{c.policy_title}</span>}
+                </span>
               </summary>
-              {c.excerpt && <p className="small">{c.excerpt}</p>}
-              {c.version && <div className="small muted mono">Version {c.version}</div>}
+              {c.excerpt && <p className="slip-text">{c.excerpt}</p>}
+              {c.version && <div className="slip-foot small muted">Version <span className="mono">{c.version}</span></div>}
             </details>
           ))}
         </div>
@@ -173,7 +180,7 @@ function BotTurn({ q, a }: { q: string; a: Answer }) {
             <button className="btn btn-ghost btn-sm" onClick={() => setDraft(null)}>Cancel</button>
           </div>
         </div>
-      ) : sent ? <div className="notice notice-ok small">{sent}</div> : (
+      ) : sent ? <div className="notice notice-ok small rise"><Icon name="check" /> {sent}</div> : (
         <div className="ask-actions">
           {a.actions.map((x) => (
             <button key={x.id} className={`btn btn-sm${a.kind === "no_answer" ? " btn-primary" : ""}`}
@@ -185,8 +192,8 @@ function BotTurn({ q, a }: { q: string; a: Answer }) {
             rated === null ? (
               <span className="ask-rate">
                 <span className="small muted">Helpful?</span>
-                <button className="btn btn-ghost btn-sm" aria-label="Helpful" onClick={() => rate(true)}>👍</button>
-                <button className="btn btn-ghost btn-sm" aria-label="Not helpful" onClick={() => rate(false)}>👎</button>
+                <button className="btn btn-ghost btn-sm icon-btn" aria-label="Helpful" onClick={() => rate(true)}><Icon name="thumbUp" /></button>
+                <button className="btn btn-ghost btn-sm icon-btn" aria-label="Not helpful" onClick={() => rate(false)}><Icon name="thumbDown" /></button>
               </span>
             ) : <span className="small muted">Thanks for the feedback.</span>
           )}

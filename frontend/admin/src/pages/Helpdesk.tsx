@@ -27,12 +27,21 @@ export default function Helpdesk() {
       </header>
 
       {s && (
-        <section className="kpis" aria-label="Last 7 days">
-          <Kpi n={s.questions_7d} label="Questions this week" />
-          <Kpi n={s.answered_without_hr_7d} label="Answered without HR"
-               sub={s.questions_7d ? `${Math.round((100 * s.answered_without_hr_7d) / s.questions_7d)}%` : undefined} />
-          <Kpi n={s.open_tickets} label="Waiting for HR" tone={s.open_tickets ? "warn" : undefined} />
-          <Kpi n={s.helpful_rate === null ? "–" : `${Math.round(s.helpful_rate * 100)}%`} label="Rated helpful" />
+        <section className="hd-lead" aria-label="Help desk summary">
+          {/* One thing leads: what needs a person now. The week's numbers support it. */}
+          <div className={`hd-waiting${s.open_tickets ? " is-busy" : ""}`}>
+            <span className="hd-waiting-n num">{s.open_tickets}</span>
+            <span>
+              <b>{s.open_tickets === 1 ? "request is" : "requests are"} waiting for HR</b>
+              <span className="small muted">{s.open_tickets ? "Oldest first in the list below." : "Nothing needs you right now."}</span>
+            </span>
+          </div>
+          <dl className="hd-week">
+            <div><dt>Questions this week</dt><dd className="num">{s.questions_7d}</dd></div>
+            <div><dt>Answered without HR</dt><dd className="num">{s.answered_without_hr_7d}
+              {s.questions_7d > 0 && <span className="muted"> ({Math.round((100 * s.answered_without_hr_7d) / s.questions_7d)}%)</span>}</dd></div>
+            <div><dt>Rated helpful</dt><dd className="num">{s.helpful_rate === null ? "No ratings yet" : `${Math.round(s.helpful_rate * 100)}%`}</dd></div>
+          </dl>
         </section>
       )}
 
@@ -71,14 +80,6 @@ export default function Helpdesk() {
   );
 }
 
-function Kpi({ n, label, sub, tone }: { n: number | string; label: string; sub?: string; tone?: string }) {
-  return (
-    <div className={`kpi card${tone ? ` kpi-${tone}` : ""}`}>
-      <div className="kpi-n mono">{n}{sub && <span className="kpi-sub"> {sub}</span>}</div>
-      <div className="small muted">{label}</div>
-    </div>
-  );
-}
 
 function TicketPanel({ id, onChange }: { id: number; onChange: () => void }) {
   const t = useLoad(() => api<Ticket>(`/api/tickets/${id}`), [id]);
