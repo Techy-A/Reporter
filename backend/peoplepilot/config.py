@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str | None = None
     smtp_password: str | None = None
-    smtp_from: str = "PeoplePilot <no-reply@localhost>"
+    smtp_from: str = "Reporter <no-reply@localhost>"
 
     # Dev only: route all candidate messages to an in-app simulator instead of WhatsApp/Telegram.
     # Ignored when PP_ENV=prod.

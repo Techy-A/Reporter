@@ -33,7 +33,7 @@ from ..common import lifespan, IPAllowListMiddleware, clear_session_cookie, hard
 from . import schemas as S
 from .deps import COOKIE, AdminCtx, admin_pre_mfa, current_admin, owner_only
 
-app = FastAPI(title="PeoplePilot Admin API", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="Reporter Admin API", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
 harden(app, origin=get_settings().admin_origin)
 app.add_middleware(IPAllowListMiddleware)
@@ -123,7 +123,7 @@ def mfa_setup(ctx: AdminCtx = Depends(admin_pre_mfa)):
         raise HTTPException(409, "Two-factor already enabled")
     secret = pyotp.random_base32()
     ctx.user.totp_secret_enc = encrypt(secret)
-    return S.MfaSetupOut(otpauth_uri=pyotp.TOTP(secret).provisioning_uri(ctx.user.email, issuer_name="PeoplePilot"))
+    return S.MfaSetupOut(otpauth_uri=pyotp.TOTP(secret).provisioning_uri(ctx.user.email, issuer_name="Reporter"))
 
 
 @app.post("/api/auth/mfa/confirm", status_code=204)

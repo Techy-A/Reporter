@@ -37,7 +37,7 @@ export default function Login() {
   return (
     <div className="auth-wrap">
       <form className="auth-card card" onSubmit={submit}>
-        <div className="auth-brand"><span className="brand-mark">P</span> PeoplePilot Admin</div>
+        <div className="auth-brand"><span className="brand-mark">R</span> Reporter Admin</div>
         <h1>Sign in</h1>
         {!askCode ? (
           <>

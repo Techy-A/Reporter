@@ -24,9 +24,9 @@ export default function Shell() {
     <div className="shell">
       <aside className="rail-nav">
         <div className="brand">
-          <span className="brand-mark" aria-hidden>P</span>
+          <span className="brand-mark" aria-hidden>R</span>
           <div>
-            <div className="brand-name">PeoplePilot</div>
+            <div className="brand-name">Reporter</div>
             <div className="brand-tag">Admin</div>
           </div>
         </div>

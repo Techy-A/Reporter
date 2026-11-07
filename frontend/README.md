@@ -1,4 +1,4 @@
-# PeoplePilot front end
+# Reporter front end
 
 Two **separate** apps, one per portal, sharing only design tokens and a tiny API client:
 

@@ -1,6 +1,6 @@
 # Security model
 
-PeoplePilot handles candidate phone numbers and employee identities. The design assumes the
+Reporter handles candidate phone numbers and employee identities. The design assumes the
 likeliest year-one failures are **identity mistakes and over-broad access**, not clever prompts.
 
 ## 1. Admin and employee portals are separate applications

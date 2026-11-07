@@ -1,4 +1,4 @@
-# PeoplePilot AI: backend (Phase 1: Interview Scheduling Agent)
+# Reporter: backend (Phase 1: Interview Scheduling Agent)
 
 A free, open-source, self-hosted agent that books interviews over **WhatsApp** (or **Telegram**), sends reminders, and hands anything unusual to a recruiter. Your data stays on your server.
 
@@ -91,4 +91,4 @@ docker compose up -d
 - 💸 Everything runs for free on your own laptop: SQLite, Telegram or the built-in simulator, and no AI needed (or a free local Ollama model).
 - ⚠️ **Not run yet:** the Postgres path (`migrate.py`, row-level security, per-role grants) and `docker compose` (no Docker on the dev machine). Test on a Postgres box before a pilot.
 - ⚠️ WhatsApp and Telegram senders are written to the public API docs but haven't been exercised against the live services.
-- ⏭️ Next: Google/Microsoft calendar free/busy + invites (today availability comes only from bookings in PeoplePilot, and interviewers add the `.ics`), and a free GitHub Actions CI workflow.
+- ⏭️ Next: Google/Microsoft calendar free/busy + invites (today availability comes only from bookings in Reporter, and interviewers add the `.ics`), and a free GitHub Actions CI workflow.

@@ -37,17 +37,19 @@ function App() {
     setMe(null);
   }
 
+  const initials = me.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+
   return (
     <div className="p-shell">
       <header className="p-top">
         <div className="p-brand">
-          <span className="p-mark" aria-hidden>P</span>
-          <span>{me.organisation}</span>
+          <span className="p-mark" aria-hidden>R</span>
+          <span className="p-brand-name">Reporter</span>
+          <span className="p-org">{me.organisation}</span>
         </div>
-        <nav className="p-nav" aria-label="Main">
-          <NavLink to="/" end>My interviews</NavLink>
-          <NavLink to="/my-data">My data</NavLink>
-        </nav>
+        <NavLink to="/my-data" className="p-avatar p-avatar-sm" aria-label="My data and sign out" title={me.name}>
+          {initials}
+        </NavLink>
       </header>
       <main className="p-main">
         <Routes>
@@ -55,9 +57,20 @@ function App() {
           <Route path="my-data" element={<MyData me={me} onSignOut={signOut} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <p className="trust p-foot">Self-hosted · you only see your own interviews</p>
       </main>
-      <footer className="p-foot trust">Employee portal · you only see your own information</footer>
+      <nav className="p-tabs" aria-label="Main">
+        <NavLink to="/" end><TabIcon d="M3 5h18v16H3zM8 3v4M16 3v4M3 10h18" />Interviews</NavLink>
+        <NavLink to="/my-data"><TabIcon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" />My data</NavLink>
+      </nav>
     </div>
+  );
+}
+
+function TabIcon({ d }: { d: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg>
   );
 }
 

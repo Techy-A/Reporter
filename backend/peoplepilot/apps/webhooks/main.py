@@ -26,7 +26,7 @@ from ..common import lifespan, harden
 log = logging.getLogger("peoplepilot.webhooks")
 MAX_BODY = 256_000
 
-app = FastAPI(title="PeoplePilot Webhooks", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="Reporter Webhooks", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
 harden(app, origin=None, csrf_exempt=("/webhooks/",))
 

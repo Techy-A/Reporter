@@ -1,4 +1,4 @@
--- PeoplePilot: Postgres hardening (run once as the database owner, AFTER the app has created tables).
+-- Reporter: Postgres hardening (run once as the database owner, AFTER the app has created tables).
 -- Second wall behind the application's tenant scoping:
 --   1. Row-level security: every tenant-owned row is visible only when app.tenant_id matches.
 --   2. Separate DB roles per process, so a bug in one portal can't read the other's tables.

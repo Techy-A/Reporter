@@ -12,7 +12,7 @@ export default function MyData({ me, onSignOut }: { me: Me; onSignOut: () => voi
         </dl>
       </section>
       <section className="p-card">
-        <h2>What PeoplePilot uses about you</h2>
+        <h2>What Reporter uses about you</h2>
         <ul className="p-list">
           <li>Your name and work email, so you can sign in and be assigned interviews.</li>
           <li>The interviews you're assigned to, and whether candidates attended.</li>

@@ -43,14 +43,14 @@ export default function TwoFactor() {
   return (
     <div className="auth-wrap">
       <form className="auth-card card" onSubmit={submit}>
-        <div className="auth-brand"><span className="brand-mark">P</span> PeoplePilot Admin</div>
+        <div className="auth-brand"><span className="brand-mark">R</span> Reporter Admin</div>
         <h1>Turn on two-factor sign-in</h1>
         <p className="muted">
           Admins can see candidate data, so every admin account needs a second step. Use any free
           authenticator app (Google Authenticator, Microsoft Authenticator, Aegis).
         </p>
         <div className="qr-row">
-          {qr ? <img src={qr} alt="QR code to add PeoplePilot to your authenticator app" width={160} height={160} />
+          {qr ? <img src={qr} alt="QR code to add Reporter to your authenticator app" width={160} height={160} />
               : <div className="qr-ph" />}
           <div className="small">
             <div className="muted">Can't scan? Enter this key:</div>

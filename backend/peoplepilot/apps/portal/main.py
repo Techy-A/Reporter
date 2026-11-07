@@ -36,7 +36,7 @@ COOKIE = tokens.COOKIE_NAMES["portal"]
 CODE_TTL = timedelta(minutes=10)
 MAX_CODE_ATTEMPTS = 5
 
-app = FastAPI(title="PeoplePilot Employee Portal API", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="Reporter Employee Portal API", docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=lifespan)
 harden(app, origin=get_settings().portal_origin)
 
@@ -50,7 +50,7 @@ def send_code(email: str, code: str) -> None:
     s = get_settings()
     if s.smtp_host:
         msg = EmailMessage()
-        msg["From"], msg["To"], msg["Subject"] = s.smtp_from, email, "Your PeoplePilot sign-in code"
+        msg["From"], msg["To"], msg["Subject"] = s.smtp_from, email, "Your Reporter sign-in code"
         msg.set_content(f"Your sign-in code is {code}. It expires in 10 minutes. "
                         "If you didn't ask for it, ignore this email.")
         with smtplib.SMTP(s.smtp_host, s.smtp_port, timeout=15) as smtp:

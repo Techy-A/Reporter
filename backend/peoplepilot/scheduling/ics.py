@@ -13,7 +13,7 @@ def build_ics(*, uid: str, start: datetime, minutes: int, summary: str, location
     end = start + timedelta(minutes=minutes)
     now = datetime.utcnow().strftime(fmt)
     lines = [
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//PeoplePilot//Interview//EN", "METHOD:PUBLISH",
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Reporter//Interview//EN", "METHOD:PUBLISH",
         "BEGIN:VEVENT", f"UID:{_esc(uid)}@peoplepilot", f"DTSTAMP:{now}",
         f"DTSTART:{start.strftime(fmt)}", f"DTEND:{end.strftime(fmt)}",
         f"SUMMARY:{_esc(summary)}", f"LOCATION:{_esc(location)}",

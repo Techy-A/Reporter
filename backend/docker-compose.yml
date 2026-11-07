@@ -1,4 +1,4 @@
-# PeoplePilot self-hosted stack. Three separate app processes + worker + Postgres.
+# Reporter self-hosted stack. Three separate app processes + worker + Postgres.
 #
 #   admin     -> Admin portal API      (bind to localhost / VPN only, never the public internet)
 #   portal    -> Employee portal API   (public, behind your HTTPS reverse proxy)

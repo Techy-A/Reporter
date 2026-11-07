@@ -1,7 +1,16 @@
-# PeoplePilot AI: front-end design prompts (v2, after council review)
+# Reporter: front-end design prompts (v3)
 
 Paste these into **Google Stitch** (fast screen exploration) or **Lovable** (working React + Tailwind + shadcn app, export to GitHub). You can also use them as a brief in **Figma** for the design system.
 Flow: Stitch → pick a direction → Figma tokens/components → Lovable → wire to the FastAPI backend.
+
+**What changed in v3:**
+- The app is now called **Reporter** (was PeoplePilot AI).
+- Prompts match the built app: Young Serif + Figtree + JetBrains Mono, exact colour hex values, and a zero-cost setup (Telegram or the built-in simulator; WhatsApp optional, no paid steps).
+- Every prompt now ends with the shared **"Do not invent" rules** below, because the first Stitch run added claims the app can't back up ("Privacy guaranteed", "Strict air-gap", "private node", Google Calendar sync) and showed interview slots on the sign-in screen before login.
+
+## Do-not-invent rules (append to every screen prompt)
+
+> **Rules:** Show only the features described in this prompt. Do not add: "guaranteed", "air-gap", "node", "military-grade" or any other security claim beyond "Self-hosted · your data stays on your organisation's server"; calendar sync badges ("Synced with Google Calendar"); AI scores or ratings of people; WhatsApp-specific badges unless the prompt mentions WhatsApp; extra navigation tabs. Before sign-in, show **no** personal or interview data at all. Use realistic Indian names and today's date, in IST.
 
 **What changed from v1 (per `council/VERDICT.md`):**
 - **Phase 1 is now the Interview Scheduling Agent**, so its screens come first.
@@ -15,7 +24,26 @@ Flow: Stitch → pick a direction → Figma tokens/components → Lovable → wi
 - **Employee portal** (`me.<company>`): employees and interviewers. "My interviews" (Phase 1), plus screens 8, 9, 18 (Phase 2). Mobile-first, lighter header, sign-in with a one-time email code (no password).
 - They share the colour tokens but **never link to each other**, have separate login pages, and the employee portal never shows anyone else's phone or email.
 
-> **Employee portal: Phase 1 "My interviews"** — A mobile-first page for an interviewer. Sign-in screen: email field → "We've sent a 6-digit code if this email is registered" → code field. Home: list of my upcoming interviews (candidate first name only, role, date/time, in-person address or video link, "Add to my calendar (.ics)"). After the slot: buttons "Attended" / "No-show". No candidate phone numbers or emails anywhere. Footer: "My data" link.
+> **Employee portal: Phase 1 "My interviews" (built; the Stitch look is ported into `frontend/portal`)** — Design two mobile screens (390 px wide) for **Reporter**, the employee portal at `me.<company>`, used by interviewers.
+>
+> **Screen A, Interviewer sign-in** (nothing personal on this screen):
+> - Brand row: "R" mark, "Reporter", small mono chip "Employee".
+> - Card: title "Interviewer sign-in", one line explaining they'll get a 6-digit code by email, no password.
+> - Step 1: work email field and a saffron button "Email me a code".
+> - Step 2: a green-tinted note "If this email is registered, a code is on its way. It works once and expires in 10 minutes", the email with a "Change" link, six code boxes, the button "Verify and sign in", and "Didn't get it? Resend in 30s".
+> - Footer line: "Self-hosted · your data stays on your organisation's server".
+>
+> **Screen B, My interviews** (after sign-in):
+> - Top bar: "R" mark, "Reporter", the organisation name in a small mono chip, and a round initials avatar on the right (opens My data).
+> - Title "My interviews", today's date in IST, and a green pill "3 scheduled".
+> - A small card with the interviewer's initials, name, and "Interviewer · Acme Corp".
+> - Filter chips: All · Needs feedback · Today, each with a count.
+> - **"Needs your action"** (saffron dot): a card for an interview that already ended. It shows "Ended 20 min ago", the candidate's **first name only** in serif with a mono ref "#42", role, round, a box with mode (Video call / In person) and the time range, "Did the candidate attend?", and two buttons: **Attended** (indigo) and **No-show** (soft red). Small note: "This goes straight to the recruiter's board. Nothing else is recorded."
+> - **"Upcoming"** (green dot), grouped by day: cards with "Starts in 45 min" (or the time), a status pill (Booked / Confirmed), the same name, role and time box, and for video calls a full-width saffron **Join call** button next to a square calendar icon button "Add to calendar (.ics)". In-person cards show the address and an "Add to calendar (.ics)" button.
+> - "Done this week": compact rows with name, date and an Attended / No-show pill.
+> - Bottom tab bar with exactly two tabs: **Interviews · My data**.
+>
+> No candidate phone numbers, emails or surnames anywhere.
 
 If you already have a design, prepend: *"Match the attached design's colours, typography and spacing."* and attach screenshots.
 
@@ -23,14 +51,14 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 
 ## 0. Global style prompt (paste first, in every tool)
 
-> Design a web app called **PeoplePilot AI**: a free, open-source, self-hosted HR operations assistant for Indian companies (50–500 employees), staffing agencies and college placement cells. Tone: calm, trustworthy, practical. No AI hype, no robots, no sparkles. Light and dark mode.
+> Design a web app called **Reporter**: a free, open-source, self-hosted HR operations assistant for Indian companies (50–500 employees), staffing agencies and college placement cells. It has two separate apps: an **Admin portal** for HR and recruiters (desktop, dense) and an **Employee portal** (mobile-first). Tone: calm, trustworthy, practical. No AI hype, no robots, no sparkles. Light and dark mode.
 >
-> **Colour:** deep indigo primary, warm saffron accent used only for primary actions, neutral greys, green/amber/red only for status.
+> **Colour:** indigo ink #1e2a5a (headings, primary surfaces), saffron #e8a33d used only for primary actions, cool paper background #f6f7fb, white cards, lines #dde1ec, slate text #5b6478. Green #2f8f6b / amber #a86a0c / red #c2413a only for status.
 >
-> **Type and layout:** Inter for UI, a humanist serif for page titles. 8px grid, 12px radius cards, subtle shadows. Dense but readable tables for HR and recruiter users.
+> **Type and layout:** Young Serif for page titles and candidate names, Figtree for UI text, JetBrains Mono for times, codes and IDs. 8px grid, 12–16px radius cards, subtle shadows. Dense but readable tables for HR and recruiter users.
 >
 > **Persistent trust cues:**
-> - A small footer badge: "Self-hosted · your data stays on your server".
+> - A small footer line: "Self-hosted · your data stays on your organisation's server". No other security claims.
 > - Every AI answer shows a **source chip** (policy · clause · version date).
 > - Every action is a **confirmation card** showing the exact change, with Confirm / Edit / Cancel. The AI never acts silently.
 >
@@ -45,9 +73,9 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 > A 5-step setup wizard shown after `docker compose up` on first login. Progress stepper at the top.
 > 1. **Organisation:** name, type (Company / Staffing agency / Placement cell), timezone (default IST).
 > 2. **Admin account:** email + mandatory MFA setup (QR code for an authenticator app).
-> 3. **Calendar:** "Connect Google Workspace" / "Connect Microsoft 365" buttons, with a list of exact permissions requested (read free/busy, create events).
-> 4. **Messaging channel:** WhatsApp Business (fields for Phone Number ID, WABA ID and access token, plus a status line "Meta business verification: Pending / Approved" and a help link "Verification takes 2–6 weeks — use Telegram meanwhile"), or Telegram bot token.
-> 5. **AI model:** "Bring your own key" (provider dropdown: Anthropic, OpenAI, Groq, OpenRouter) or "Local model (Ollama URL)". Note: "Only used to understand free-text replies. Buttons work without AI."
+> 3. **Interviewers:** add names and work emails (they sign in to the employee portal with an emailed code). Calendar sync is shown as a disabled "Coming later" card, not a working button.
+> 4. **Messaging channel:** three cards. **Built-in simulator** (default, free, chats appear inside the admin portal), **Telegram bot** (free; bot token + username), **WhatsApp** (optional, marked "Needs a Meta business account").
+> 5. **AI model (optional):** "None — buttons only" (default), "Local model (Ollama URL, free)", or "Bring your own key". Note: "Only used to understand free-text replies. Buttons work without AI."
 >
 > End screen: a checklist with green ticks and a "Send test message to my phone" button.
 
@@ -63,13 +91,13 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 
 ## 3. New interview round + CSV upload
 
-> A modal or page to create a round: role, interviewer(s) (searchable, shows calendar connected ✓), duration, mode (in-person address / video link auto-created), slot window (date range + daily hours), buffer between interviews, and max slots offered (default 3).
+> A modal or page to create a round: role, interviewer(s) (searchable), duration, mode (in-person address / video link pasted by the recruiter), slot window (date range + daily hours), buffer between interviews, and max slots offered (default 3).
 > CSV upload step: drag-and-drop, column mapper (name, phone, email, role), validation preview with errors highlighted (invalid Indian mobile numbers, duplicates), and a WhatsApp opt-in consent checkbox per row with explanatory text.
 > Final step: preview of the WhatsApp invite template exactly as the candidate will see it.
 
 ## 4. Candidate WhatsApp conversation (mobile mockup)
 
-> A phone mockup of the candidate's WhatsApp chat with "PeoplePilot · Acme Corp Hiring".
+> A phone mockup of the candidate's WhatsApp chat with "Reporter · Acme Corp Hiring".
 > 1. Invite message: "Hi Riya, you're shortlisted for Customer Support Associate at Acme. Pick an interview slot:" with **3 reply buttons** (Tue 12 Nov, 11:00 / Tue 12 Nov, 15:00 / Wed 13 Nov, 10:30) and a "None of these work" option.
 > 2. Confirmation: date, time, address/map link or video link, interviewer name, and "Add to calendar".
 > 3. Reminder at T-24h with buttons **Confirm · Reschedule · Can't make it**.
@@ -85,7 +113,7 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 
 ## 6. Identity & sync health
 
-> Admin screen with health cards: Calendar connection (last sync, errors), Messaging channel (status, messages used this month vs 1,000 free service messages, template approval status), AI model (reachable ✓, avg response time), Database backups (last backup). Table of problems to fix: invalid numbers, candidates who never opted in, failed messages with reasons. A "Run diagnostics" button.
+> Admin screen with health cards: Messaging channel (simulator / Telegram / WhatsApp: status, last message sent, failures), AI model (reachable ✓, avg response time), Database backups (last backup). Table of problems to fix: invalid numbers, candidates who never opted in, failed messages with reasons. A "Run diagnostics" button.
 
 ## 7. Audit log + trust pack
 
@@ -144,7 +172,7 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 
 ## 15. Broadcast composer
 
-> Compose an announcement: audience picker (all / location / department / shift / client process), channel (WhatsApp template / Teams / email), message editor with WhatsApp template preview, schedule, and an estimated WhatsApp cost line ("~1,200 utility messages ≈ ₹140 billed by Meta to your account"). Common templates: holiday notice, payroll cut-off, policy change.
+> Compose an announcement: audience picker (all / location / department / shift / client process), channel (Telegram / email / WhatsApp if connected), message editor with a preview, and schedule. No cost lines. Common templates: holiday notice, payroll cut-off, policy change.
 
 ## 16. HR team workload
 
@@ -156,7 +184,7 @@ If you already have a design, prepend: *"Match the attached design's colours, ty
 
 ## 18. My data (employee)
 
-> One simple page: what PeoplePilot uses about me, who viewed my records (log), my conversations (delete), the DPDP notice text, and a "Raise a data request" button. Friendly plain language.
+> One simple page: what Reporter uses about me, who viewed my records (log), my conversations (delete), the DPDP notice text, and a "Raise a data request" button. Friendly plain language.
 
 ---
 
