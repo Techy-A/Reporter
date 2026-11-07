@@ -3,19 +3,37 @@ import { api, errorText } from "@pp/shared";
 import { useMe } from "../auth";
 import type { Employee } from "../types";
 import { useLoad } from "../useLoad";
+import { CsvButton } from "./Knowledge";
+
+const EMP_TEMPLATE = "name,email,location,grade,employment_type,interviewer\nPriya Sharma,priya@acme.co.in,Bengaluru,L2,Full-time,yes\n";
+const BLANK = { name: "", email: "", location: "", grade: "", employment_type: "", is_interviewer: false };
 
 export default function People() {
   const me = useMe();
   const people = useLoad(() => api<Employee[]>("/api/employees"));
-  const [f, setF] = useState({ name: "", email: "" });
+  const [f, setF] = useState(BLANK);
+  const [edit, setEdit] = useState<Employee | null>(null);
   const [err, setErr] = useState("");
 
   async function add(e: FormEvent) {
     e.preventDefault();
     setErr("");
     try {
-      await api("/api/employees", { json: { ...f, is_interviewer: true } });
-      setF({ name: "", email: "" });
+      await api("/api/employees", { json: f });
+      setF(BLANK);
+      void people.reload();
+    } catch (x) {
+      setErr(errorText(x));
+    }
+  }
+
+  async function saveEdit(e: FormEvent) {
+    e.preventDefault();
+    if (!edit) return;
+    try {
+      await api(`/api/employees/${edit.id}`, { method: "PATCH", json: {
+        location: edit.location, grade: edit.grade, employment_type: edit.employment_type, is_interviewer: edit.is_interviewer } });
+      setEdit(null);
       void people.reload();
     } catch (x) {
       setErr(errorText(x));
@@ -36,34 +54,63 @@ export default function People() {
     <div className="page">
       <header className="page-head">
         <div>
-          <h1>Interviewers & team</h1>
+          <h1>People</h1>
           <p className="summary">
-            Interviewers sign in to the separate employee portal with a code sent to their email. They see only
+            Everyone here can sign in to the separate employee portal with a code sent to their email, and ask HR
+            questions there. Location, grade and type decide which policies apply to them. Interviewers also see
             their own interviews, never candidates' phone numbers.
           </p>
         </div>
       </header>
 
       <section className="card pad">
-        <h2>Interviewers</h2>
-        <form className="inline-form" onSubmit={add}>
-          <input className="input" required placeholder="Full name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} aria-label="Name" />
-          <input className="input" required type="email" placeholder="Work email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} aria-label="Email" />
-          <button className="btn btn-primary">Add interviewer</button>
+        <h2>Employees</h2>
+        <form className="form-grid" onSubmit={add}>
+          <label className="field"><span>Full name</span><input className="input" required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
+          <label className="field"><span>Work email</span><input className="input" required type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></label>
+          <label className="field"><span>Location</span><input className="input" value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Bengaluru" /></label>
+          <label className="field"><span>Grade</span><input className="input" value={f.grade} onChange={(e) => setF({ ...f, grade: e.target.value })} placeholder="L2" /></label>
+          <label className="field"><span>Employment type</span><input className="input" value={f.employment_type} onChange={(e) => setF({ ...f, employment_type: e.target.value })} placeholder="Full-time" /></label>
+          <label className="check"><input type="checkbox" checked={f.is_interviewer} onChange={(e) => setF({ ...f, is_interviewer: e.target.checked })} /> Interviewer</label>
+          <div className="form-actions"><button className="btn btn-primary">Add person</button></div>
         </form>
+        <CsvButton path="/api/employees/csv" label="Import CSV" template={EMP_TEMPLATE} templateName="employees.csv"
+                   hint="Columns: name, email, location, grade, employment_type, interviewer (yes/no). Existing emails are updated."
+                   onDone={() => void people.reload()} />
         {err && <div className="notice notice-bad">{err}</div>}
         <table className="table">
-          <thead><tr><th>Name</th><th>Email</th><th>Status</th><th /></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Location · grade · type</th><th>Role</th><th>Status</th><th /></tr></thead>
           <tbody>
-            {(people.data ?? []).map((p) => (
+            {(people.data ?? []).map((p) => edit?.id === p.id ? (
               <tr key={p.id}>
                 <td className="strong">{p.name}</td>
                 <td className="small">{p.email}</td>
+                <td colSpan={2}>
+                  <form className="inline-form" onSubmit={saveEdit}>
+                    <input className="input" aria-label="Location" placeholder="Location" value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} />
+                    <input className="input" aria-label="Grade" placeholder="Grade" value={edit.grade} onChange={(e) => setEdit({ ...edit, grade: e.target.value })} />
+                    <input className="input" aria-label="Employment type" placeholder="Type" value={edit.employment_type} onChange={(e) => setEdit({ ...edit, employment_type: e.target.value })} />
+                    <label className="check"><input type="checkbox" checked={edit.is_interviewer} onChange={(e) => setEdit({ ...edit, is_interviewer: e.target.checked })} /> Interviewer</label>
+                    <button className="btn btn-sm btn-primary">Save</button>
+                    <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEdit(null)}>Cancel</button>
+                  </form>
+                </td>
+                <td /><td />
+              </tr>
+            ) : (
+              <tr key={p.id}>
+                <td className="strong">{p.name}</td>
+                <td className="small">{p.email}</td>
+                <td className="small">{[p.location, p.grade, p.employment_type].filter(Boolean).join(" · ") || <span className="muted">Not set: only company-wide policies apply</span>}</td>
+                <td className="small">{p.is_interviewer ? "Interviewer" : "Employee"}</td>
                 <td>{p.active ? <span className="pill pill-ok">Active</span> : <span className="pill">Removed</span>}</td>
-                <td className="right">{p.active && <button className="btn btn-ghost btn-sm btn-danger" onClick={() => deactivate(p)}>Remove</button>}</td>
+                <td className="right nowrap">
+                  {p.active && <button className="btn btn-ghost btn-sm" onClick={() => setEdit(p)}>Edit</button>}
+                  {p.active && <button className="btn btn-ghost btn-sm btn-danger" onClick={() => deactivate(p)}>Remove</button>}
+                </td>
               </tr>
             ))}
-            {people.data?.length === 0 && <tr><td colSpan={4} className="muted">No interviewers yet.</td></tr>}
+            {people.data?.length === 0 && <tr><td colSpan={6} className="muted">No one yet. Add people or import a CSV.</td></tr>}
           </tbody>
         </table>
       </section>

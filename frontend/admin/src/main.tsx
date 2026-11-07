@@ -14,6 +14,8 @@ import Rounds from "./pages/Rounds";
 import People from "./pages/People";
 import Settings from "./pages/Settings";
 import Activity from "./pages/Activity";
+import Helpdesk from "./pages/Helpdesk";
+import Knowledge from "./pages/Knowledge";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -28,6 +30,8 @@ createRoot(document.getElementById("root")!).render(
             <Route index element={<Board />} />
             <Route path="rounds" element={<Rounds />} />
             <Route path="people" element={<People />} />
+            <Route path="helpdesk" element={<Helpdesk />} />
+            <Route path="answers" element={<Knowledge />} />
             <Route path="settings" element={<Settings />} />
             <Route path="activity" element={<Activity />} />
           </Route>

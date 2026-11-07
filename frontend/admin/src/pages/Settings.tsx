@@ -39,6 +39,7 @@ export default function Settings() {
       {owner ? (
         <>
           <PauseSwitch paused={!!h?.messaging_paused} onDone={() => void health.reload()} />
+          <HelpdeskContacts />
           <TelegramForm onDone={() => void health.reload()} />
           <WhatsAppForm onDone={() => void health.reload()} />
         </>
@@ -56,6 +57,43 @@ function Row({ ok, label, detail }: { ok: boolean; label: string; detail: string
       <span className="strong">{label}</span>
       <span className="muted small">{detail}</span>
     </li>
+  );
+}
+
+function HelpdeskContacts() {
+  const cur = useLoad(() => api<{ ic_contact: string; hr_contact: string }>("/api/settings/helpdesk"));
+  const [f, setF] = useState<{ ic_contact: string; hr_contact: string } | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const v = f ?? cur.data ?? { ic_contact: "", hr_contact: "" };
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    try {
+      await api("/api/settings/helpdesk", { method: "PUT", json: v });
+      setMsg({ ok: true, text: "Saved." });
+    } catch (x) {
+      setMsg({ ok: false, text: errorText(x) });
+    }
+  }
+
+  return (
+    <form className="card pad" onSubmit={save}>
+      <h2>Sensitive-topic contacts</h2>
+      <p className="small muted">
+        When an employee writes about harassment (POSH), self-harm or a legal issue, the assistant stops and shows
+        these contacts instead of answering. Free national helplines (Tele-MANAS 14416, emergency 112) are always shown.
+      </p>
+      <div className="form-grid">
+        <label className="field span-2"><span>Internal Committee (POSH) contact</span>
+          <input className="input" value={v.ic_contact} onChange={(e) => setF({ ...v, ic_contact: e.target.value })}
+                 placeholder="Meera Iyer, Presiding Officer · ic@acme.co.in · ext 2104" /></label>
+        <label className="field span-2"><span>HR contact</span>
+          <input className="input" value={v.hr_contact} onChange={(e) => setF({ ...v, hr_contact: e.target.value })}
+                 placeholder="hr@acme.co.in · 080 4000 1234" /></label>
+      </div>
+      <div className="form-actions"><button className="btn btn-primary">Save contacts</button></div>
+      {msg && <div className={`notice ${msg.ok ? "notice-ok" : "notice-bad"}`}>{msg.text}</div>}
+    </form>
   );
 }
 

@@ -1,0 +1,8 @@
+# Optional MCP server (idea 8). Install into its own venv: see peoplepilot/mcp_server.py
+mcp==1.26.0
+SQLAlchemy==2.0.57
+pydantic-settings==2.16.2
+cryptography==43.0.3
+httpx==0.28.1
+psycopg[binary]==3.2.13
+tzdata==2026.6

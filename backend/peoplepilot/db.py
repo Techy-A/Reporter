@@ -47,7 +47,32 @@ def reset_engine() -> None:
 def init_db() -> None:
     from . import models  # noqa: F401  (register tables)
 
-    Base.metadata.create_all(get_engine())
+    engine = get_engine()
+    Base.metadata.create_all(engine)
+    if engine.dialect.name == "sqlite":
+        _sqlite_add_new_columns(engine)
+
+
+def _sqlite_add_new_columns(engine) -> None:
+    """Dev convenience: add columns introduced after a local SQLite file was created.
+    (Postgres installs run migrate.py, which owns schema changes.)"""
+    from sqlalchemy import inspect
+    from sqlalchemy.schema import CreateColumn
+
+    insp = inspect(engine)
+    with engine.begin() as conn:
+        for table in Base.metadata.sorted_tables:
+            have = {c["name"] for c in insp.get_columns(table.name)}
+            for col in table.columns:
+                if col.name in have:
+                    continue
+                ddl = str(CreateColumn(col).compile(dialect=engine.dialect))
+                arg = col.default.arg if col.default is not None else None
+                if isinstance(arg, bool):
+                    ddl += f" DEFAULT {int(arg)}"
+                elif isinstance(arg, (str, int, float)):
+                    ddl += " DEFAULT '" + str(arg).replace("'", "''") + "'"
+                conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN {ddl}"))
 
 
 def get_session() -> Iterator[Session]:

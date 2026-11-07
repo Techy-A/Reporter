@@ -163,18 +163,23 @@ def add_admin(body: S.AdminUserIn, session: Session = Depends(get_session), ctx:
 def add_employee(body: S.EmployeeIn, session: Session = Depends(get_session), ctx: AdminCtx = Depends(current_admin)):
     if session.scalars(scoped(Employee, ctx.tenant_id).where(Employee.email == body.email.lower())).first():
         raise HTTPException(409, "Employee already exists")
-    e = Employee(tenant_id=ctx.tenant_id, name=body.name, email=body.email.lower(), is_interviewer=body.is_interviewer)
+    e = Employee(tenant_id=ctx.tenant_id, name=body.name, email=body.email.lower(), is_interviewer=body.is_interviewer,
+                 location=body.location.strip(), grade=body.grade.strip(), employment_type=body.employment_type.strip())
     session.add(e)
     session.flush()
     audit(session, tenant_id=ctx.tenant_id, actor_type="admin", actor_id=ctx.user.id, action="employee_created",
           record_type="employee", record_id=e.id)
-    return S.EmployeeOut(id=e.id, name=e.name, email=e.email, is_interviewer=e.is_interviewer, active=e.active)
+    return _emp_out(e)
+
+
+def _emp_out(e: Employee) -> S.EmployeeOut:
+    return S.EmployeeOut(id=e.id, name=e.name, email=e.email, is_interviewer=e.is_interviewer, active=e.active,
+                         location=e.location or "", grade=e.grade or "", employment_type=e.employment_type or "")
 
 
 @app.get("/api/employees", response_model=list[S.EmployeeOut])
 def list_employees(session: Session = Depends(get_session), ctx: AdminCtx = Depends(current_admin)):
-    return [S.EmployeeOut(id=e.id, name=e.name, email=e.email, is_interviewer=e.is_interviewer, active=e.active)
-            for e in session.scalars(scoped(Employee, ctx.tenant_id).order_by(Employee.name))]
+    return [_emp_out(e) for e in session.scalars(scoped(Employee, ctx.tenant_id).order_by(Employee.name))]
 
 
 @app.post("/api/employees/{employee_id}/deactivate", status_code=204)
@@ -478,6 +483,12 @@ def health(session: Session = Depends(get_session), ctx: AdminCtx = Depends(curr
         candidates_without_consent=session.scalar(select(func.count()).select_from(Candidate).where(
             Candidate.tenant_id == ctx.tenant_id, Candidate.consent.is_(False))) or 0,
     )
+
+
+# ================================================================== Phase 2: help desk (own module)
+from . import helpdesk  # noqa: E402
+
+app.include_router(helpdesk.router)
 
 
 # ================================================================== dev-only candidate simulator

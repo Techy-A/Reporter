@@ -38,7 +38,16 @@ GRANT INSERT ON audit_events TO pp_portal;
 GRANT SELECT (id, tenant_id, round_id, name, status, booked_start, interviewer_id, outcome, fsm_state)
   ON candidates TO pp_portal;
 GRANT UPDATE (outcome, fsm_state) ON candidates TO pp_portal;
+-- Phase 2 help desk: the portal reads policies/FAQs/leave balances (app code filters to the
+-- signed-in employee), and writes only its own tickets and question metadata.
+GRANT SELECT ON policies, policy_clauses, faq_overrides, leave_balances TO pp_portal;
+GRANT SELECT, INSERT, UPDATE ON hr_tickets, hr_ticket_messages, ask_events TO pp_portal;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO pp_portal;
+-- Retention purge of closed help-desk conversations.
+GRANT SELECT ON hr_tickets TO pp_bot;
+GRANT DELETE ON hr_ticket_messages TO pp_bot;
+GRANT SELECT ON hr_ticket_messages TO pp_bot;
+GRANT SELECT, DELETE ON ask_events TO pp_bot;
 
 -- ---------------------------------------------------------------- row-level security
 -- app.tenant_id is set per transaction by db.set_tenant(). Unset => no rows.
@@ -49,7 +58,9 @@ DO $$
 DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY['rounds','round_interviewers','candidates','messages','action_nonces',
-                           'reminders_sent','audit_events'] LOOP
+                           'reminders_sent','audit_events','policies','policy_clauses',
+                           'faq_overrides','leave_balances','hr_tickets','hr_ticket_messages','ask_events',
+                           'eval_cases'] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', t);
     EXECUTE format('DROP POLICY IF EXISTS tenant_isolation ON %I', t);

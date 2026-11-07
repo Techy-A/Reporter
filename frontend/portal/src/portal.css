@@ -38,7 +38,7 @@
 
 /* ---------- bottom tabs (phone), inline under the bar on wide screens ---------- */
 .p-tabs {
-  position: sticky; bottom: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr;
+  position: sticky; bottom: 0; z-index: 5; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
   background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(8px);
   border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
 }
@@ -151,10 +151,53 @@
 @media (min-width: 720px) {
   .p-main { padding-top: 32px; }
   .p-tabs {
-    position: static; order: -1; grid-template-columns: auto auto; justify-content: center; gap: 6px;
+    position: static; order: -1; grid-auto-columns: auto; justify-content: center; gap: 6px;
     border-top: 0; border-bottom: 1px solid var(--line); padding: 6px;
   }
   .p-tabs a { grid-auto-flow: column; align-items: center; gap: 6px; font-size: 13.5px; padding: 6px 14px; }
   .p-top { order: -2; }
   .p-shell { grid-template-rows: auto auto 1fr; }
 }
+
+/* ---------- Ask HR chat ---------- */
+.ask-thread { display: grid; gap: 10px; align-content: start; min-height: 30vh; }
+.ask-hello { padding: 14px 16px; border-radius: 16px; background: var(--ink-soft); color: var(--text); }
+.ask-hello p { margin: 0; }
+.ask-me, .ask-bot { max-width: 92%; padding: 10px 14px; border-radius: 16px; display: grid; gap: 8px; }
+.ask-me { justify-self: end; background: var(--ink); color: var(--surface); border-bottom-right-radius: 5px; white-space: pre-wrap; }
+.ask-me .ask-source { color: color-mix(in srgb, var(--surface) 75%, transparent); }
+.ask-bot { justify-self: start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 5px; box-shadow: var(--shadow); }
+.ask-bot.is-unknown { border-color: color-mix(in srgb, var(--saffron) 55%, var(--line)); }
+.ask-typing { color: var(--slate); font-size: 14px; }
+.ask-source { font-weight: 650; color: var(--ok); }
+.ask-text { margin: 0; white-space: pre-wrap; }
+.ask-cites { display: grid; gap: 6px; }
+.ask-cite { border-left: 3px solid var(--saffron); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; }
+.ask-cite summary { cursor: pointer; font-size: 14px; }
+.ask-cite-title { font-weight: 650; color: var(--ink-2); }
+.ask-cite p { margin: 6px 0 4px; }
+.ask-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ask-rate { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; }
+.ask-draft { display: grid; gap: 8px; }
+.ask-sensitive { border-color: var(--line); background: var(--paper); max-width: 100%; }
+.ask-sensitive p { margin: 0; }
+.ask-lock { font-size: 18px; }
+.ask-contacts { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ask-contacts li { display: grid; gap: 1px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.ask-dock {
+  position: sticky; bottom: 64px; z-index: 4; display: grid; gap: 8px; padding: 10px 0 4px;
+  background: linear-gradient(to bottom, transparent, var(--paper) 18%);
+}
+.ask-dock .p-chip { text-decoration: none; }
+.ask-dock .p-chip:disabled { opacity: .6; }
+.ask-form { display: flex; gap: 8px; }
+.ask-form .input { min-height: 46px; font-size: 16px; }
+.ask-form .btn { min-height: 46px; }
+.ask-note { margin: 0; text-align: center; }
+.req { gap: 8px; }
+.req-head {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; background: none; border: 0; padding: 0;
+  text-align: left; cursor: pointer; color: inherit;
+}
+.req-thread { display: grid; gap: 8px; margin-top: 8px; }
+@media (min-width: 720px) { .ask-dock { bottom: 0; } }

@@ -5,7 +5,9 @@ import { useAuth, useMe } from "./auth";
 const NAV = [
   { to: "/", label: "Scheduling board", end: true },
   { to: "/rounds", label: "Interview rounds" },
-  { to: "/people", label: "Interviewers & team" },
+  { to: "/helpdesk", label: "Help desk" },
+  { to: "/answers", label: "Answers & policies" },
+  { to: "/people", label: "People" },
   { to: "/settings", label: "Settings" },
 ];
 

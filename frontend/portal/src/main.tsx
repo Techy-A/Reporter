@@ -7,8 +7,10 @@ import "./portal.css";
 import SignIn from "./pages/SignIn";
 import MyInterviews from "./pages/MyInterviews";
 import MyData from "./pages/MyData";
+import AskHR from "./pages/AskHR";
+import Requests from "./pages/Requests";
 
-export type Me = { name: string; email: string; organisation: string };
+export type Me = { name: string; email: string; organisation: string; is_interviewer: boolean };
 
 function App() {
   const [me, setMe] = useState<Me | null | undefined>(undefined);
@@ -53,14 +55,20 @@ function App() {
       </header>
       <main className="p-main">
         <Routes>
-          <Route index element={<MyInterviews me={me} />} />
+          <Route index element={<AskHR me={me} />} />
+          {me.is_interviewer && <Route path="interviews" element={<MyInterviews me={me} />} />}
+          <Route path="requests" element={<Requests />} />
           <Route path="my-data" element={<MyData me={me} onSignOut={signOut} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <p className="trust p-foot">Self-hosted · you only see your own interviews</p>
+        <p className="trust p-foot">Self-hosted · you only see your own information</p>
       </main>
       <nav className="p-tabs" aria-label="Main">
-        <NavLink to="/" end><TabIcon d="M3 5h18v16H3zM8 3v4M16 3v4M3 10h18" />Interviews</NavLink>
+        <NavLink to="/" end><TabIcon d="M4 5h16v11H8l-4 4zM8 9h8M8 12h5" />Ask HR</NavLink>
+        {me.is_interviewer && (
+          <NavLink to="/interviews"><TabIcon d="M3 5h18v16H3zM8 3v4M16 3v4M3 10h18" />Interviews</NavLink>
+        )}
+        <NavLink to="/requests"><TabIcon d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5" />Requests</NavLink>
         <NavLink to="/my-data"><TabIcon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" />My data</NavLink>
       </nav>
     </div>

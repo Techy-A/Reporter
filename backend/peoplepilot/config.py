@@ -45,6 +45,15 @@ class Settings(BaseSettings):
     llm_base_url: str | None = None  # e.g. http://localhost:11434/v1 or https://api.groq.com/openai/v1
     llm_api_key: str | None = None
     llm_model: str | None = None
+    llm_context_tokens: int = 1800  # budget for policy text sent to the model per question
+    llm_max_output_tokens: int = 350
+    llm_tools: bool = True  # model supports OpenAI-style tool calling (Ollama llama3.1/qwen2.5 do)
+    llm_max_steps: int = 4  # agent loop limit per question
+    # Optional embeddings for semantic search (OpenAI-compatible /embeddings, e.g. local Ollama).
+    embed_base_url: str | None = None
+    embed_api_key: str | None = None
+    embed_model: str | None = None
+    ticket_retention_days: int = 180  # closed help-desk conversations
 
     # --- email for employee portal one-time codes ---
     smtp_host: str | None = None

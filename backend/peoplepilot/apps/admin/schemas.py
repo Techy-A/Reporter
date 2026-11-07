@@ -69,6 +69,9 @@ class EmployeeIn(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     email: EmailStr
     is_interviewer: bool = True
+    location: str = Field(default="", max_length=100)
+    grade: str = Field(default="", max_length=50)
+    employment_type: str = Field(default="", max_length=50)
 
 
 class EmployeeOut(BaseModel):
@@ -77,6 +80,9 @@ class EmployeeOut(BaseModel):
     email: str
     is_interviewer: bool
     active: bool
+    location: str = ""
+    grade: str = ""
+    employment_type: str = ""
 
 
 class RoundIn(BaseModel):

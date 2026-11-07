@@ -30,9 +30,10 @@ from ...security import tokens
 from ...security.crypto import constant_time_eq, lookup_hash
 from ...security.ratelimit import portal_code_limiter
 from ..common import lifespan, clear_session_cookie, harden, set_session_cookie
+from .deps import current_employee
 
 log = logging.getLogger("peoplepilot.portal")
-COOKIE = tokens.COOKIE_NAMES["portal"]
+from .deps import COOKIE  # noqa: E402
 CODE_TTL = timedelta(minutes=10)
 MAX_CODE_ATTEMPTS = 5
 
@@ -84,6 +85,7 @@ class MeOut(BaseModel):
     name: str
     email: str
     organisation: str
+    is_interviewer: bool
 
 
 class MyInterviewOut(BaseModel):
@@ -153,21 +155,6 @@ def verify_code(body: CodeVerifyIn, response: Response, session: Session = Depen
     audit(session, tenant_id=emp.tenant_id, actor_type="employee", actor_id=emp.id, action="portal_login")
 
 
-def current_employee(request: Request, session: Session = Depends(get_session)) -> Employee:
-    raw = request.cookies.get(COOKIE)
-    if not raw:
-        raise HTTPException(401, "Not signed in")
-    try:
-        claims = tokens.verify("portal", raw)
-    except jwt.PyJWTError:
-        raise HTTPException(401, "Not signed in")
-    emp = session.get(Employee, int(claims["sub"]))
-    if not emp or not emp.active or emp.tenant_id != claims.get("tid") or emp.session_version != claims.get("sv"):
-        raise HTTPException(401, "Not signed in")
-    set_tenant(session, emp.tenant_id)
-    return emp
-
-
 @app.post("/api/auth/logout", status_code=204)
 def logout(response: Response, emp: Employee = Depends(current_employee)):
     emp.session_version += 1
@@ -177,7 +164,8 @@ def logout(response: Response, emp: Employee = Depends(current_employee)):
 # ------------------------------------------------------------------ my data
 @app.get("/api/me", response_model=MeOut)
 def me(session: Session = Depends(get_session), emp: Employee = Depends(current_employee)):
-    return MeOut(name=emp.name, email=emp.email, organisation=session.get(Tenant, emp.tenant_id).name)
+    return MeOut(name=emp.name, email=emp.email, organisation=session.get(Tenant, emp.tenant_id).name,
+                 is_interviewer=emp.is_interviewer)
 
 
 def _my_interviews_query(emp: Employee):
@@ -229,3 +217,9 @@ def mark_outcome(interview_id: int, body: OutcomeIn, session: Session = Depends(
     c.outcome, c.fsm_state = body.outcome, "done"
     audit(session, tenant_id=emp.tenant_id, actor_type="employee", actor_id=emp.id, action=f"outcome:{body.outcome}",
           record_type="candidate", record_id=c.id)
+
+
+# Phase 2: Ask HR (help desk). Kept in its own module.
+from . import helpdesk  # noqa: E402
+
+app.include_router(helpdesk.router)

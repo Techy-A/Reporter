@@ -8,11 +8,11 @@ import logging
 import time
 from datetime import timedelta
 
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 
 from .config import get_settings
 from .db import init_db, session_scope, utcnow
-from .models import ActionNonce, AuditEvent, LoginCode, Message
+from .models import ActionNonce, AskEvent, AuditEvent, HrTicket, HrTicketMessage, LoginCode, Message
 from .scheduling.engine import due_reminders
 from .security.redact import install_log_redaction
 
@@ -27,6 +27,12 @@ def purge(session) -> dict[str, int]:
         delete(Message).where(Message.created_at < now - timedelta(days=s.message_retention_days))).rowcount
     out["nonces"] = session.execute(delete(ActionNonce).where(ActionNonce.expires_at < now - timedelta(days=7))).rowcount
     out["login_codes"] = session.execute(delete(LoginCode).where(LoginCode.expires_at < now - timedelta(days=1))).rowcount
+    stale_closed = select(HrTicket.id).where(HrTicket.status == "closed",
+                                             HrTicket.updated_at < now - timedelta(days=s.ticket_retention_days))
+    out["ticket_messages"] = session.execute(
+        delete(HrTicketMessage).where(HrTicketMessage.ticket_id.in_(stale_closed))).rowcount
+    out["ask_events"] = session.execute(
+        delete(AskEvent).where(AskEvent.created_at < now - timedelta(days=s.audit_retention_days))).rowcount
     out["audit"] = session.execute(
         delete(AuditEvent).where(AuditEvent.created_at < now - timedelta(days=s.audit_retention_days))).rowcount
     return out
