@@ -278,3 +278,19 @@ fieldset.chips { border: 0; padding: 0; margin: 0; }
 .ticket-row { transition: background var(--dur-fast) var(--ease); }
 .tab { transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
 .table td, .facts dd { font-variant-numeric: tabular-nums; }
+
+/* Readable line length on every admin page (taste_audit: body measure). */
+.page p, .page .hint { max-width: 72ch; }
+
+/* Grid children may shrink; wide tables scroll inside their card instead of widening the page
+   (verify_responsive @280-414px). */
+.page { grid-template-columns: minmax(0, 1fr); }
+.page > *, .hd-grid > * { min-width: 0; }
+.card:has(> .table), .card:has(> table) { overflow-x: auto; }
+.tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+.inline-form { flex-wrap: wrap; }
+.inline-form .input { min-width: 0; }
+@media (max-width: 900px) { .shell { grid-template-columns: minmax(0, 1fr); } .main { min-width: 0; } }
+@media (max-width: 600px) { .page { padding: 20px 16px 48px; } }
+.form-grid > * { min-width: 0; }
+@media (max-width: 480px) { .form-grid { grid-template-columns: minmax(0, 1fr); } .form-grid .span-2, .form-grid .span-all { grid-column: auto; } }

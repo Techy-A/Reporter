@@ -48,6 +48,7 @@ export default function Setup() {
         </label>
         <label className="field">
           <span>What kind of organisation?</span>
+          {/* ds-allow-native-select: native is the better phone control; see design/DESIGN_RULES.md */}
           <select className="input" value={f.org_kind} onChange={set("org_kind")}>
             <option value="company">Company</option>
             <option value="staffing_agency">Staffing agency</option>

@@ -144,6 +144,7 @@ function AdminUsers() {
         <input className="input" type="email" required placeholder="Email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} aria-label="Email" />
         <input className="input" type="password" required minLength={12} placeholder="Temporary password (12+ characters)" value={f.password}
                onChange={(e) => setF({ ...f, password: e.target.value })} aria-label="Temporary password" autoComplete="new-password" />
+        {/* ds-allow-native-select: native is the better phone control; see design/DESIGN_RULES.md */}
         <select className="input" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })} aria-label="Role">
           <option value="recruiter">Recruiter</option>
           <option value="owner">Owner</option>

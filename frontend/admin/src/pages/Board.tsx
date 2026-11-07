@@ -73,6 +73,7 @@ export default function Board() {
         <div className="table-tools">
           <label className="field inline">
             <span>Round</span>
+            {/* ds-allow-native-select: native is the better phone control; see design/DESIGN_RULES.md */}
             <select className="input" value={roundId} onChange={(e) => setRoundId(e.target.value ? Number(e.target.value) : "")}>
               <option value="">All rounds</option>
               {(rounds.data ?? []).map((r) => (

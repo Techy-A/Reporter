@@ -20,11 +20,12 @@
   border: 1px solid var(--line);
 }
 .p-brand-name { font-family: var(--font-display); font-size: 19px; color: var(--ink); }
-/* Plain secondary text, not a badge. */
+/* Plain secondary text, not a badge. Hidden on the narrowest phones so the header never overflows. */
 .p-org, .p-realm {
   font-size: 13px; color: var(--slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  padding-left: 10px; border-left: 1px solid var(--line);
+  padding-left: 10px; border-left: 1px solid var(--line); min-width: 0; display: none;
 }
+@media (min-width: 400px) { .p-org, .p-realm { display: block; } }
 .p-avatar {
   width: 42px; height: 42px; border-radius: 50%; flex: none; display: inline-grid; place-items: center;
   background: var(--ink-soft); color: var(--ink-2); font-weight: 700; font-size: 14px; text-decoration: none;
@@ -53,7 +54,7 @@
 .p-tabs a.active { color: var(--ink-2); background: var(--ink-soft); }
 
 /* ---------- page header ---------- */
-.p-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.p-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 12px; flex-wrap: wrap; }
 .p-title p { margin: 4px 0 0; }
 .p-me { display: flex; align-items: center; gap: 12px; }
 .p-me-name { font-weight: 700; color: var(--text); }
@@ -165,7 +166,7 @@
 .ask-head.is-compact h1 { font-size: 28px; }
 .ask-head.is-compact p { display: none; }
 .ask-thread { display: grid; gap: 12px; align-content: start; }
-.ask-me, .ask-bot { max-width: 92%; padding: 12px 14px; border-radius: var(--r-lg); display: grid; gap: 10px; }
+.ask-me, .ask-bot { max-width: 92%; padding: 12px 14px; border-radius: var(--r-lg); display: grid; gap: 10px; overflow-wrap: anywhere; min-width: 0; }
 .ask-me { justify-self: end; background: var(--ink); color: var(--surface); border-bottom-right-radius: var(--r-xs); white-space: pre-wrap; }
 .ask-me .ask-source { color: color-mix(in srgb, var(--surface) 75%, transparent); }
 .ask-bot { justify-self: start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: var(--r-xs); }

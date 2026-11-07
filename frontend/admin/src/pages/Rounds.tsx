@@ -127,6 +127,7 @@ function NewRound({ interviewers, onDone, onCancel }: { interviewers: Employee[]
       </label>
       <label className="field">
         <span>Format</span>
+        {/* ds-allow-native-select: native is the better phone control; see design/DESIGN_RULES.md */}
         <select className="input" value={f.mode} onChange={set("mode")}>
           <option value="video">Video call</option>
           <option value="in_person">In person</option>

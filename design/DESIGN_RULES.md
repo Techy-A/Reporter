@@ -61,3 +61,43 @@ occasional dropdowns. Revisit if we add a component library with a tested listbo
 13 Remove embellishments · 14 Inner radius = outer − padding · 15 Improve text contrast ·
 16 Wrap headlines properly (`text-wrap: balance`) · 17 Align by eye, not pixels · 18 Tabular numbers ·
 19 Add loading states · 20 Animate useful feedback.
+
+## Second deliberate exception: status colours
+
+`taste_audit` counts 7 to 9 hues on screens that show statuses (Booked, Confirmed, Needs recruiter,
+No-show, Draft, Active). Those colours carry information, always next to a word, so they stay. Everything
+decorative uses the one accent (saffron) and the indigo family; "info" reuses indigo rather than a second blue.
+
+## Running the checks (ux-ui-agent-skills 2.10.0, installed in `design/kit/`)
+
+The kit is vendored (MIT, see `design/kit/LICENSE`) with its 23 skills, rules and design-critic. Its
+hooks are **not** wired into this project, so nothing runs automatically; run the checks after UI changes.
+They use the Chrome already on the machine through Playwright (no browser download).
+
+One-time setup:
+
+```bash
+npm install --prefix design/kit
+```
+
+With both front ends running (`npm run dev` in `frontend/admin` and `frontend/portal`), snapshot the real
+screens (API answered with sample data, no sign-in needed), then run the checks:
+
+```bash
+node design/harness/snapshot.mjs
+```
+
+```bash
+node design/kit/scripts/verify_responsive.mjs design/harness/out
+```
+
+```bash
+node design/kit/scripts/axe_audit.mjs design/harness/out/portal-ask-chat.html --dark
+```
+
+Also: `slop_tells.mjs`, `taste_audit.mjs`, `verify_overflow.mjs`, `verify_target_size.mjs` (per file), and
+`python design/kit/scripts/check_no_emoji.py frontend/admin/src frontend/portal/src` (set `PYTHONUTF8=1` on Windows
+for `lint_native_select.py`).
+
+Last run (8 screens): axe 0 violations in light and dark; no overflow at 280/320/414 px; no clipped text;
+all tap targets at least 24 px; no emoji; native selects marked as the deliberate exception above.

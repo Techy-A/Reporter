@@ -379,13 +379,14 @@ function Checks() {
         {report && (
           <div className={`notice ${report.passed === report.total ? "notice-ok" : "notice-bad"}`}>
             {report.passed} of {report.total} passed.
-            {report.sensitive_total > 0 && ` Sensitive questions routed to a person: ${report.sensitive_routed} of ${report.sensitive_total}${report.sensitive_routed < report.sensitive_total ? " — fix this before going live." : "."}`}
+            {report.sensitive_total > 0 && ` Sensitive questions routed to a person: ${report.sensitive_routed} of ${report.sensitive_total}${report.sensitive_routed < report.sensitive_total ? ". Fix this before going live." : "."}`}
           </div>
         )}
         <form className="form-grid" onSubmit={addCase}>
           <label className="field span-2"><span>Question</span>
             <input className="input" required value={c.question} onChange={(e) => setC({ ...c, question: e.target.value })} placeholder="Can I club sick and casual leave?" /></label>
           <label className="field"><span>Expected</span>
+            {/* ds-allow-native-select: native is the better phone control; see design/DESIGN_RULES.md */}
             <select className="input" value={c.expect_route} onChange={(e) => setC({ ...c, expect_route: e.target.value })}>
               {ROUTES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select></label>

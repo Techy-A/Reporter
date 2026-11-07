@@ -16,14 +16,15 @@
   --line: #dde1ec;
   --text: #161b2e;
   --slate: #5b6478;
-  --ok: #2f8f6b;
+  /* Status colours: all >= 4.5:1 on white and on their soft tint (checked with design/kit/scripts/contrast.py). */
+  --ok: #1f6e50;
   --ok-soft: #e3f3ec;
-  --warn: #a86a0c;
+  --warn: #8a5300;
   --warn-soft: #fbefdc;
-  --bad: #c2413a;
+  --bad: #a5322c;
   --bad-soft: #f9e4e2;
-  --info: #3b5bdb;
-  --info-soft: #e6ebfc;
+  --info: var(--ink-2); /* one accent family: info reuses the indigo, no second blue */
+  --info-soft: var(--ink-soft);
 
   --font-display: "Young Serif", Georgia, serif;
   --font-ui: "Figtree Variable", system-ui, sans-serif;
@@ -54,10 +55,12 @@
     --line: #2a3253;
     --text: #e8ebf5;
     --slate: #9aa3bd;
+    --ok: #7fd8b0;
+    --warn: #f3bd66;
+    --bad: #ff9a91;
     --ok-soft: #173a2e;
     --warn-soft: #3d2c10;
     --bad-soft: #42201e;
-    --info-soft: #1d2650;
     --shadow: 0 1px 2px rgb(0 0 0 / 30%);
     color-scheme: dark;
   }
@@ -71,10 +74,12 @@
   --line: #2a3253;
   --text: #e8ebf5;
   --slate: #9aa3bd;
+  --ok: #7fd8b0;
+  --warn: #f3bd66;
+  --bad: #ff9a91;
   --ok-soft: #173a2e;
   --warn-soft: #3d2c10;
   --bad-soft: #42201e;
-  --info-soft: #1d2650;
   color-scheme: dark;
 }
 
