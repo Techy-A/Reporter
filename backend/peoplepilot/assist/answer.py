@@ -38,7 +38,8 @@ FAQ_MIN_SCORE = 0.75
 MAX_ANSWER_CHARS = 900
 
 _EMPLOYEE_SENSITIVE = re.compile(
-    r"\b(posh|sexual\w*|inappropriate(?:ly)? touch\w*|unwanted (?:advances|touch\w*)|internal committee|"
+    # "POSH" alone is usually about the mandatory training, so only complaint-like uses count.
+    r"\b(posh (?:complaint|case|issue|matter|violation)|(?:file|raise|report)\w* (?:a )?posh|sexual\w*|inappropriate\w*|touch(?:ed|es|ing)? me|grop\w*|unwanted (?:advances|touch\w*)|internal committee|"
     r"bully\w*|depress\w*|want to die|end (?:my|it all)|hurt myself|khud ko|mar jaana|marna chahta|"
     r"marna chahti|unsafe at work|retaliat\w*|whistle ?blow\w*|data breach|leaked my)\b",
     re.IGNORECASE,
@@ -147,7 +148,8 @@ def leave_lines(session: Session, emp: Employee) -> tuple[list[str], date | None
 def _leave(session: Session, emp: Employee) -> AskResult:
     lines, as_of = leave_lines(session, emp)
     if not lines:
-        return AskResult(kind="leave", text="HR hasn't shared your leave balance here yet. You can ask them directly.",
+        # Counts as unanswered: HR still has to help this person.
+        return AskResult(kind="no_answer", text="HR hasn't shared your leave balance here yet. You can ask them directly.",
                          actions=[ASK_HR])
     return AskResult(kind="leave", text="Your leave balance, from HR's records as of "
                      f"{as_of:%d %b %Y}:\n" + "\n".join(lines))

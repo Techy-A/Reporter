@@ -378,3 +378,32 @@ def test_try_question_previews_without_recording(org):
     assert r["route"] == "policy"
     with db.session_scope() as s:
         assert s.scalars(select(AskEvent)).first() is None
+
+
+@pytest.mark.parametrize("text", [
+    "My manager keeps harassing me", "he touched me inappropriately", "a colleague made inappropriate comments",
+    "I want to file a POSH complaint", "someone groped me at the offsite", "my team lead is bullying me",
+    "I feel like I want to die", "mujhe pareshan kar raha hai", "I'm going to send a legal notice",
+])
+def test_sensitive_phrasings_are_caught(text):
+    assert answer.is_sensitive(text)
+
+
+@pytest.mark.parametrize("text", [
+    "Is POSH training mandatory?", "when is the POSH awareness session", "how many sick leaves per year",
+    "Can I club sick and casual leave?", "who handles referrals",
+])
+def test_ordinary_questions_are_not_flagged(text):
+    assert not answer.is_sensitive(text)
+
+
+def test_faq_match_ignores_filler_verbs():
+    from peoplepilot.assist.retrieve import faq_match_score
+
+    assert faq_match_score("Who handles referrals?", "Who do I contact for referrals?") >= answer.FAQ_MIN_SCORE
+    assert faq_match_score("Who handles payroll?", "Who do I contact for referrals?") == 0
+
+
+def test_missing_leave_data_counts_as_unanswered(org, portal_app):
+    r = portal(portal_app, "asha@acme.co.in").post("/api/ask", headers=H, json={"quick": "leave_balance"}).json()
+    assert r["kind"] == "no_answer" and r["actions"][0]["id"] == "ask_hr"

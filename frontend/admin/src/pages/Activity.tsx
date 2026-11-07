@@ -2,7 +2,7 @@ import { api, fmtDayTime, parseUtc } from "@pp/shared";
 import type { AuditRow } from "../types";
 import { useLoad } from "../useLoad";
 
-const ACTOR: Record<string, string> = { admin: "Admin", employee: "Employee", candidate: "Candidate", system: "Assistant" };
+const ACTOR: Record<string, string> = { admin: "Admin", employee: "Employee", candidate: "Candidate", system: "System" };
 
 export default function Activity() {
   const log = useLoad(() => api<AuditRow[]>("/api/audit?limit=300"));

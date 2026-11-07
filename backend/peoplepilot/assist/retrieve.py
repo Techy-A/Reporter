@@ -172,9 +172,17 @@ def search(session: Session, emp: Employee, question: str, today: date, k: int =
     return hits[:k]
 
 
+_FAQ_FILLER = {"contact", "handle", "ask", "find", "help", "process", "procedure", "way", "person", "someone",
+               "team", "reach", "send", "submit", "apply", "check", "info", "information", "detail"}
+
+
 def faq_match_score(question: str, faq_question: str) -> float:
     """How well an employee's question matches an HR-written FAQ (0..1)."""
     q, f = set(tokens(question)), set(tokens(faq_question))
+    # "Who handles referrals?" should match "Who do I contact for referrals?": ignore filler verbs
+    # as long as something more specific is left on both sides.
+    if q - _FAQ_FILLER and f - _FAQ_FILLER:
+        q, f = q - _FAQ_FILLER, f - _FAQ_FILLER
     if not q or not f:
         return 0.0
     both = len(q & f)
