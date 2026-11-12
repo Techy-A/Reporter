@@ -2,7 +2,7 @@
 
     python -m peoplepilot.migrate
 
-Creates tables, then (on Postgres) the per-process roles and row-level-security policies from
+Applies the Alembic migrations (alembic/versions), then (on Postgres) the per-process roles and row-level-security policies from
 migrations/postgres_rls.sql. Role passwords are taken from each process's database URL, so the
 SQL file never needs editing.
 """
@@ -14,7 +14,7 @@ from pathlib import Path
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
 
-from .db import get_engine, init_db
+from .db import get_engine
 
 SQL = Path(__file__).resolve().parent.parent / "migrations" / "postgres_rls.sql"
 ROLE_ENV = {
@@ -26,7 +26,13 @@ ROLE_ENV = {
 
 
 def main() -> None:
-    init_db()
+    from alembic import command
+    from alembic.config import Config
+
+    root = Path(__file__).resolve().parent.parent
+    cfg = Config(str(root / "alembic.ini"))
+    cfg.set_main_option("script_location", str(root / "alembic"))
+    command.upgrade(cfg, "head")
     engine = get_engine()
     if engine.dialect.name != "postgresql":
         print("Tables created (SQLite: row-level security not applicable).")

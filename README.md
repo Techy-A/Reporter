@@ -127,8 +127,10 @@ Not tested yet:
 - Postgres, row-level security and `docker compose`.
 - The live WhatsApp and Telegram APIs.
 
-Not built yet: emailed sign-in codes in production (SMTP is wired but untried), hosting, backups, versioned
-database migrations, CI, request forms, Telegram Ask HR, and calendar sync.
+Built but untried on real infrastructure: emailed sign-in codes (SMTP), GitHub Actions CI (`.github/workflows/ci.yml`),
+Alembic migrations (`backend/alembic`), and `python -m peoplepilot.backup`.
+
+Not built yet: hosting, request forms, Telegram Ask HR, and calendar sync.
 
 ## Security
 

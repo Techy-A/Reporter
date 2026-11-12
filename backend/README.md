@@ -160,6 +160,16 @@ python -m venv .venv-mcp
 
 Setup for Claude Desktop is in the docstring of [`mcp_server.py`](peoplepilot/mcp_server.py).
 
+## Migrations and backups
+
+`python -m peoplepilot.migrate` runs Alembic (`alembic/versions`). The baseline creates any missing table; for later schema changes add a numbered file with `alembic revision -m "what changed"` (run from `backend/`). An existing Postgres database from before Phase 2 still needs its new columns added by hand once.
+
+```bash
+.venv/Scripts/python -m peoplepilot.backup
+```
+
+writes a consistent copy of the database to `./backups` (SQLite copy, or `pg_dump` on Postgres). Keep `PP_DATA_KEY` safe offline too, since backups are unreadable without it.
+
 ## Status / not yet done
 - ✅ Tested here: everything in `tests/` on SQLite (64 passing, including the help-desk safety, isolation, grounding, agent and eval tests), the scheduling flow and the employee Ask HR flow in the browser, and the MCP server's tools.
 - ⚠️ The AI paths are tested against a scripted fake model, not a real one (no Ollama on the dev machine). Run your checks after connecting a model.
